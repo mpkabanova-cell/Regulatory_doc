@@ -1,0 +1,15 @@
+.env
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+dist/
+frontend/dist/
+backend/uploads/*
+!backend/uploads/.gitkeep
+chroma_db/
+metadata/*.jsonl
+metadata/indexed_files.json
