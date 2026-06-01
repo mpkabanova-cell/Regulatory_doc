@@ -1,17 +1,12 @@
 import {
   BookOpen,
-  Bot,
+  Boxes,
   CheckCircle2,
   ClipboardCheck,
   Database,
   FileText,
   GraduationCap,
-  Menu,
-  PanelLeft,
   ShieldCheck,
-  SlidersHorizontal,
-  Sparkles,
-  X,
 } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { ChatPanel } from "./components/ChatPanel";
@@ -29,7 +24,6 @@ function App() {
   const [mode, setMode] = useState<Mode>("chat");
   const [stats, setStats] = useState<CorpusStats | null>(null);
   const [healthy, setHealthy] = useState<boolean | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     void getHealth().then(setHealthy);
@@ -38,70 +32,48 @@ function App() {
 
   return (
     <main className="min-h-screen bg-[#fbf8ff] p-4 text-slate-950 md:p-6">
-      <div className="mx-auto flex h-[calc(100vh-32px)] max-w-[1500px] flex-col gap-4 md:h-[calc(100vh-48px)]">
-        <header className="flex min-h-[74px] shrink-0 items-center justify-between rounded-[30px] border border-white/80 bg-white/70 px-4 py-3 shadow-[0_18px_60px_rgba(111,76,255,0.08)] backdrop-blur-xl md:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <Button className="lg:hidden" size="icon" variant="outline" onClick={() => setSidebarOpen(true)}>
-              <Menu className="h-4 w-4" />
-            </Button>
-            <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#8f5cf6]">
-                AI • Нормативная база
-              </p>
-              <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-slate-950 md:text-[26px]">
-                Агент работы с документами
-              </h1>
-              <p className="hidden text-sm text-slate-500 md:block">
-                Поиск по ФГОС, ФРП, СанПиН и профстандартам
-              </p>
-            </div>
+      <div className="mx-auto flex min-h-[calc(100vh-32px)] max-w-[1480px] flex-col gap-4 md:min-h-[calc(100vh-48px)]">
+        <header className="flex min-h-[72px] shrink-0 items-center justify-between rounded-[28px] bg-white/85 px-5 py-3 shadow-[0_18px_60px_rgba(118,82,180,0.10)] ring-1 ring-violet-100/70 backdrop-blur">
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase tracking-[0.34em] text-violet-500">AI • Нормативная база</p>
+            <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-slate-950 md:text-2xl">
+              Агент работы с документами
+            </h1>
+            <p className="hidden text-sm text-slate-500 md:block">Поиск по ФГОС, ФРП, СанПиН и профстандартам</p>
           </div>
-          <div className="hidden items-center gap-2 xl:flex">
+
+          <div className="hidden items-center gap-2 lg:flex">
             <HeaderStat label="документов" value={stats?.documents ?? "—"} />
             <HeaderStat label="ФРП" value={stats?.frp ?? "—"} />
             <HeaderStat label="ФГОС" value={stats?.fgos ?? "—"} />
             <HeaderStat
-              label="индекс"
-              value={healthy === null ? "проверка" : healthy ? "готов" : "ошибка"}
+              label="база"
+              value={healthy === null ? "проверка" : healthy ? "готова" : "ошибка"}
               tone={healthy === false ? "danger" : "success"}
             />
           </div>
         </header>
 
-        <div className="grid min-h-0 flex-1 gap-5 lg:grid-cols-[390px_minmax(0,1fr)]">
-          {sidebarOpen && (
-            <div
-              className="fixed inset-0 z-40 bg-slate-950/20 backdrop-blur-sm lg:hidden"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-          <aside
-            className={cn(
-              "fixed inset-y-4 left-4 z-50 flex w-[min(390px,calc(100vw-32px))] flex-col overflow-hidden rounded-[34px] border border-white/80 bg-gradient-to-b from-[#f3eaff] via-[#f7f1ff] to-[#eee6ff] p-4 shadow-[0_28px_90px_rgba(105,63,230,0.22)] transition-transform lg:sticky lg:top-6 lg:z-auto lg:h-full lg:w-auto lg:translate-x-0",
-              sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%+32px)]",
-            )}
-          >
+        <div className="grid min-h-0 flex-1 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
+          <aside className="flex min-h-0 flex-col rounded-[30px] bg-gradient-to-b from-[#f3eaff] via-[#f8f3ff] to-[#ede5ff] p-4 shadow-[0_24px_80px_rgba(111,76,255,0.16)] ring-1 ring-white/80">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9b6df7]">Шаги работы</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-500">Шаги работы</p>
                 <h2 className="text-lg font-semibold text-slate-950">Параметры запроса</h2>
               </div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-violet-600 shadow-sm">
-                <PanelLeft className="hidden h-4 w-4 lg:block" />
-                <button className="lg:hidden" onClick={() => setSidebarOpen(false)} type="button">
-                  <X className="h-4 w-4" />
-                </button>
+              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-violet-600 shadow-sm ring-1 ring-violet-100">
+                <Boxes className="h-4 w-4" />
               </div>
             </div>
 
-            <Card className="border-white/80 bg-white/90 p-4 shadow-[0_18px_46px_rgba(111,76,255,0.08)] backdrop-blur">
+            <PanelCard>
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#edf3ff] text-[#5577e8]">
-                  <Bot className="h-5 w-5" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                  <BookOpen className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-slate-950">Режим работы</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">Выберите сценарий работы с нормативной базой.</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">Выберите сценарий</p>
                 </div>
               </div>
               <div className="mt-4 grid gap-2">
@@ -118,16 +90,16 @@ function App() {
                   onClick={() => setMode("check")}
                 />
               </div>
-            </Card>
+            </PanelCard>
 
-            <Card className="mt-3 border-white/80 bg-white/90 p-4 shadow-[0_18px_46px_rgba(111,76,255,0.08)] backdrop-blur">
+            <PanelCard className="mt-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#f2eaff] text-[#7c3aed]">
-                  <SlidersHorizontal className="h-5 w-5" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+                  <GraduationCap className="h-5 w-5" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-950">Фильтры</p>
-                  <p className="mt-1 text-xs text-slate-500">Для контекста запроса</p>
+                  <p className="mt-1 text-xs text-slate-500">Для контекста поиска</p>
                 </div>
               </div>
               <div className="mt-4 space-y-3">
@@ -135,25 +107,25 @@ function App() {
                 <FilterSelect label="Уровень образования" options={["Любой", "НОО", "ООО", "СОО"]} />
                 <FilterSelect label="Предмет" options={["Любой", "Информатика", "Математика", "Русский язык", "История"]} />
               </div>
-            </Card>
+            </PanelCard>
 
-            <Card className="mt-3 border-white/80 bg-white/90 p-4 shadow-[0_18px_46px_rgba(111,76,255,0.08)] backdrop-blur">
+            <PanelCard className="mt-3">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eafff6] text-emerald-600">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
                   <Database className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-950">Нормативная база</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">Локальный индекс ChromaDB</p>
+                  <p className="text-sm font-semibold text-slate-950">Локальная нормативная база</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">ChromaDB индекс</p>
                 </div>
               </div>
               <div className="mt-4 grid grid-cols-3 gap-2">
-                <Stat label="Док." value={stats?.documents ?? "—"} />
                 <Stat label="ФРП" value={stats?.frp ?? "—"} />
                 <Stat label="ФГОС" value={stats?.fgos ?? "—"} />
+                <Stat label="СанПиН" value={stats?.sanpin ?? "—"} />
               </div>
-              <div className="mt-4 flex items-center justify-between rounded-2xl bg-slate-50 px-3 py-2">
-                <span className="text-xs font-medium text-slate-500">Статус API</span>
+              <div className="mt-3 flex items-center justify-between rounded-2xl bg-slate-50 px-3 py-2 ring-1 ring-slate-100">
+                <span className="text-xs font-medium text-slate-500">Статус</span>
                 <span className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700">
                   <span
                     className={cn(
@@ -163,55 +135,51 @@ function App() {
                       healthy === false && "bg-rose-500",
                     )}
                   />
-                  {healthy === null ? "проверка" : healthy ? "доступен" : "недоступен"}
+                  {healthy === null ? "проверка" : healthy ? "готова" : "ошибка"}
                 </span>
               </div>
-            </Card>
+            </PanelCard>
 
-            <Card className="mt-3 border-white/80 bg-white/90 p-4 shadow-[0_18px_46px_rgba(111,76,255,0.08)] backdrop-blur">
-              <p className="text-sm font-semibold text-slate-950">Быстрые темы</p>
+            <PanelCard className="mt-3">
+              <p className="text-sm font-semibold text-slate-950">Быстрые запросы</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                {["План урока", "Требования ФГОС", "Результаты обучения", "КТП", "СанПиН", "Внеурочная деятельность"].map((tag) => (
-                  <Badge className="cursor-pointer border-violet-100 bg-violet-50 text-violet-700 transition hover:bg-violet-100" key={tag}>
-                    {tag}
-                  </Badge>
-                ))}
+                {["План урока", "Требования ФГОС", "Результаты обучения", "КТП", "СанПиН", "Внеурочная деятельность"].map(
+                  (tag) => (
+                    <Badge
+                      className="cursor-pointer border-violet-100 bg-violet-50 text-violet-700 transition hover:bg-violet-100"
+                      key={tag}
+                    >
+                      {tag}
+                    </Badge>
+                  ),
+                )}
               </div>
-            </Card>
+            </PanelCard>
 
-            <Button className="mt-auto h-14 rounded-[22px] bg-gradient-to-r from-[#8b35f6] to-[#5138f2] text-white shadow-[0_18px_40px_rgba(116,64,237,0.32)] hover:from-[#7c2ce4] hover:to-[#4430d8]">
+            <Button className="mt-4 h-14 rounded-[22px] bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-[0_18px_38px_rgba(124,58,237,0.28)] hover:from-violet-700 hover:to-indigo-700">
               <CheckCircle2 className="h-4 w-4" />
               {mode === "chat" ? "Задать вопрос базе" : "Проверить материал"}
             </Button>
           </aside>
 
-          <section className="flex min-w-0 flex-col overflow-hidden rounded-[34px] border border-white/80 bg-white shadow-[0_22px_70px_rgba(93,89,135,0.10)]">
+          <section className="flex min-w-0 flex-col overflow-hidden rounded-[30px] bg-white shadow-[0_22px_70px_rgba(93,89,135,0.10)] ring-1 ring-slate-100">
             <div className="flex shrink-0 flex-col gap-3 border-b border-slate-100 px-6 py-5 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#a26af7]">
+                <p className="text-xs font-bold uppercase tracking-[0.3em] text-violet-500">
                   {mode === "chat" ? "Материалы" : "Проверка"}
                 </p>
                 <h2 className="mt-1 text-xl font-semibold text-slate-950">
                   {mode === "chat" ? "Поиск нормативных ответов" : "Проверка соответствия"}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Фильтры: Все документы • Любой уровень • Любой предмет
-                </p>
+                <p className="mt-1 text-sm text-slate-500">Фильтры: Все документы • Любой уровень • Любой предмет</p>
               </div>
-              <div className="flex rounded-[20px] bg-[#f6f3fb] p-1 shadow-inner">
-                <Button
-                  className="rounded-xl"
-                  variant={mode === "chat" ? "outline" : "ghost"}
-                  onClick={() => setMode("chat")}
-                >
+
+              <div className="flex rounded-[20px] bg-slate-100 p-1 shadow-inner">
+                <Button className="rounded-xl" variant={mode === "chat" ? "outline" : "ghost"} onClick={() => setMode("chat")}>
                   <BookOpen className="h-4 w-4" />
                   Чат
                 </Button>
-                <Button
-                  className="rounded-xl"
-                  variant={mode === "check" ? "outline" : "ghost"}
-                  onClick={() => setMode("check")}
-                >
+                <Button className="rounded-xl" variant={mode === "check" ? "outline" : "ghost"} onClick={() => setMode("check")}>
                   <ClipboardCheck className="h-4 w-4" />
                   Проверка
                 </Button>
@@ -225,6 +193,14 @@ function App() {
         </div>
       </div>
     </main>
+  );
+}
+
+function PanelCard({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <Card className={cn("border-0 bg-white/90 p-4 shadow-[0_16px_42px_rgba(111,76,255,0.08)] ring-1 ring-white/80", className)}>
+      {children}
+    </Card>
   );
 }
 
@@ -256,7 +232,7 @@ function ModeButton({
 
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2 text-center">
+    <div className="rounded-2xl bg-slate-50 px-3 py-2 text-center ring-1 ring-slate-100">
       <p className="text-lg font-semibold text-slate-950">{value}</p>
       <p className="mt-0.5 text-[11px] font-medium text-slate-500">{label}</p>
     </div>
@@ -275,10 +251,10 @@ function HeaderStat({
   return (
     <div
       className={cn(
-        "min-w-24 rounded-2xl border px-3 py-2 text-center shadow-sm",
-        tone === "default" && "border-slate-200 bg-white",
-        tone === "success" && "border-emerald-100 bg-emerald-50",
-        tone === "danger" && "border-rose-100 bg-rose-50",
+        "min-w-24 rounded-2xl px-3 py-2 text-center shadow-sm ring-1",
+        tone === "default" && "bg-white ring-slate-100",
+        tone === "success" && "bg-emerald-50 ring-emerald-100",
+        tone === "danger" && "bg-rose-50 ring-rose-100",
       )}
     >
       <p className="text-sm font-semibold text-slate-950">{value}</p>
@@ -294,7 +270,7 @@ function FilterSelect({ label, options }: { label: string; options: string[] }) 
         <GraduationCap className="h-3.5 w-3.5 text-violet-400" />
         {label}
       </span>
-      <select className="h-10 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-800 outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100">
+      <select className="h-10 w-full rounded-2xl border-0 bg-slate-50 px-3 text-sm text-slate-800 outline-none ring-1 ring-slate-100 transition focus:bg-white focus:ring-4 focus:ring-violet-100">
         {options.map((option) => (
           <option key={option}>{option}</option>
         ))}
