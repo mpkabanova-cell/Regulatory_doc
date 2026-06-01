@@ -1,4 +1,4 @@
-import { FileSearch, MessageSquareText, Paperclip, Search, SendHorizontal, Sparkles } from "lucide-react";
+import { SendHorizontal, Sparkles } from "lucide-react";
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -9,11 +9,14 @@ import { Card } from "./ui/card";
 import { Textarea } from "./ui/textarea";
 import { SourceCard } from "./SourceCard";
 
-type ChatPanelProps = {
-  onOpenCheck?: () => void;
-};
+const SUGGESTED_PROMPTS = [
+  "Какие результаты по информатике в 7 классе?",
+  "Какие требования ФГОС ООО к рабочей программе?",
+  "Что проверить в плане урока?",
+  "Какие ограничения СанПиН важны для школы?",
+];
 
-export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
+export function ChatPanel() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [messages, setMessages] = useState<Message[]>([
@@ -82,69 +85,10 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
     textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 144)}px`;
   }
 
-  const latestSources = [...messages].reverse().find((message) => message.sources?.length)?.sources ?? [];
-
   return (
-    <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[minmax(0,1fr)_390px]">
-      <Card className="flex min-h-0 flex-col overflow-hidden rounded-[28px] border-slate-100 bg-white shadow-[0_18px_54px_rgba(93,89,135,0.08)]">
-        <div className="border-b border-slate-100 px-5 py-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-slate-950">План ответа</p>
-              <p className="text-xs text-slate-500">Поиск по локальной нормативной базе с цитированием</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm">
-                <MessageSquareText className="h-3.5 w-3.5 text-violet-500" />
-                Чат
-              </span>
-              <span className="inline-flex h-9 items-center gap-2 rounded-full bg-gradient-to-r from-[#8b35f6] to-[#563df2] px-3 text-xs font-semibold text-white shadow-[0_12px_28px_rgba(124,58,237,0.22)]">
-                <Search className="h-3.5 w-3.5" />
-                Поиск источников
-              </span>
-              <button
-                className="inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:border-violet-200 hover:text-violet-700"
-                onClick={onOpenCheck}
-                type="button"
-              >
-                <FileSearch className="h-3.5 w-3.5" />
-                Проверить документ
-              </button>
-            </div>
-          </div>
-        </div>
-
+    <div className="h-full min-h-0">
+      <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[28px] border-slate-100 bg-white shadow-[0_18px_54px_rgba(93,89,135,0.08)]">
         <div ref={scrollRef} className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-gradient-to-b from-[#fcfbff] to-[#f8fafc] px-4 py-5">
-          {messages.length === 1 && !loading && (
-            <div className="mx-auto max-w-3xl rounded-[30px] border border-violet-100 bg-white/95 p-7 text-center shadow-[0_18px_54px_rgba(111,76,255,0.10)]">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f1e8ff] text-[#7c3aed]">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-slate-950">Спросите нормативную базу</h3>
-              <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
-                Я найду подтверждение в локальных документах, покажу страницу, раздел и цитату. Если основания нет,
-                откажусь от ответа.
-              </p>
-              <div className="mt-5 grid gap-2 sm:grid-cols-2">
-                {[
-                  "Какие результаты по информатике в 7 классе?",
-                  "Какие требования ФГОС ООО к рабочей программе?",
-                  "Что проверить в плане урока?",
-                  "Какие ограничения СанПиН важны для школы?",
-                ].map((prompt) => (
-                  <button
-                    className="rounded-2xl border border-violet-100 bg-[#fbf8ff] px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 hover:shadow-sm"
-                    key={prompt}
-                    onClick={() => handleInput(prompt)}
-                    type="button"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           {messages.map((message, index) => (
             <div key={`${message.role}-${index}`}>
               <div className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -199,16 +143,21 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
               {error}
             </div>
           )}
+          {messages.length === 1 && !loading && (
+            <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+              {SUGGESTED_PROMPTS.map((prompt) => (
+                <button
+                  className="shrink-0 rounded-full border border-violet-100 bg-[#fbf8ff] px-3 py-2 text-left text-xs font-medium text-slate-600 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
+                  key={prompt}
+                  onClick={() => handleInput(prompt)}
+                  type="button"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="flex items-end gap-3">
-            <Button
-              aria-label="Загрузить документ"
-              title="Для проверки документов перейдите во вкладку Проверка документов"
-              type="button"
-              variant="outline"
-              size="icon"
-            >
-              <Paperclip className="h-4 w-4" />
-            </Button>
             <Textarea
               ref={textareaRef}
               className="max-h-36 min-h-14 flex-1 rounded-[28px] border-violet-100 bg-[#fbf8ff] py-3 shadow-[0_12px_30px_rgba(111,76,255,0.08)]"
@@ -230,31 +179,6 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
             Enter отправляет, Shift+Enter переносит строку. Первый ответ может занять 15–30 секунд.
           </p>
         </form>
-      </Card>
-
-      <Card className="hidden min-h-0 flex-col overflow-hidden rounded-[28px] border-slate-100 bg-white shadow-[0_18px_54px_rgba(93,89,135,0.08)] xl:flex">
-        <div className="border-b border-slate-100 px-5 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-slate-950">Подобранные источники</p>
-              <p className="mt-1 text-xs text-slate-500">Показаны релевантные ссылки, если они доступны</p>
-            </div>
-            <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-500">
-              {latestSources.length ? `Показано: ${latestSources.length}` : "Пусто"}
-            </span>
-          </div>
-        </div>
-        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-          {latestSources.length ? (
-            latestSources.map((source, index) => (
-              <SourceCard index={index + 1} key={`${source.source_path}-${index}`} source={source} />
-            ))
-          ) : (
-            <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-500">
-              После ответа здесь появятся страницы, цитаты и пути к документам.
-            </p>
-          )}
-        </div>
       </Card>
     </div>
   );

@@ -187,7 +187,7 @@ function App() {
             </div>
 
             <div className="min-h-0 flex-1 overflow-hidden bg-[#fbfbfe] p-5">
-              {mode === "chat" ? <ChatPanel onOpenCheck={() => setMode("check")} /> : <CheckPanel />}
+              {mode === "chat" ? <ChatPanel /> : <CheckPanel />}
             </div>
           </section>
         </div>
