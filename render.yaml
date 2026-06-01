@@ -1,9 +1,10 @@
 services:
   - type: web
-    name: regulatory-rag-api
-    runtime: python
+    name: regulatory-rag
+    runtime: docker
     plan: starter
-    buildCommand: pip install -r backend/requirements.txt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     preDeployCommand: python scripts/update_index.py
     startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
@@ -37,13 +38,4 @@ services:
       - key: UPLOADS_DIR
         value: /var/data/uploads
       - key: CORS_ORIGINS
-        sync: false
-
-  - type: web
-    name: regulatory-rag-frontend
-    runtime: static
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        sync: false
+        value: https://regulatory-rag.onrender.com

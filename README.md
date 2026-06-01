@@ -76,6 +76,39 @@ npm run dev
 В загруженной нормативной базе не найдено нормативное основание для ответа.
 ```
 
-## Деплой
+## Деплой На Render Одним Web Service
 
-`render.yaml` описывает два сервиса: FastAPI Web Service и Render Static Site. Для production у backend подключен persistent disk под ChromaDB, metadata, Hugging Face cache и uploads. Pre-deploy команда запускает `python scripts/update_index.py`, поэтому первый деплой может занять заметное время. После создания frontend-сервиса укажите его URL в `CORS_ORIGINS`, а URL backend в `VITE_API_URL`.
+Проект деплоится как один Render Web Service. FastAPI отдает API и собранный React frontend из `frontend/dist`.
+
+1. Запушьте проект в GitHub.
+2. В Render выберите `New` -> `Blueprint` и подключите репозиторий.
+3. Render прочитает `render.yaml` и создаст сервис `regulatory-rag`.
+4. В переменных окружения сервиса задайте секрет:
+
+```env
+OPENROUTER_API_KEY=sk-or-v1-...
+```
+
+5. Если Render выдаст другой URL сервиса, обновите:
+
+```env
+CORS_ORIGINS=https://your-service-name.onrender.com
+```
+
+6. Запустите deploy.
+
+Первый deploy может быть долгим: `preDeployCommand` запускает `python scripts/update_index.py`, скачивает embedding-модель и строит ChromaDB индекс на persistent disk.
+
+После deploy проверьте:
+
+```text
+https://your-service-name.onrender.com/health
+https://your-service-name.onrender.com/stats
+https://your-service-name.onrender.com
+```
+
+Если индексация не успеет завершиться на первом deploy, откройте Render Shell и вручную выполните:
+
+```bash
+python scripts/update_index.py
+```

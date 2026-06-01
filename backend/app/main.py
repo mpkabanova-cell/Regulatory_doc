@@ -5,9 +5,10 @@ from uuid import uuid4
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from backend.app.checks.service import CheckService
-from backend.app.core.config import get_settings
+from backend.app.core.config import PROJECT_ROOT, get_settings
 from backend.app.documents.metadata import discover_document_paths, infer_document_metadata, load_manifest
 from backend.app.models.schemas import ChatRequest, ChatResponse, CheckRequest, CheckResponse, UploadResponse
 from backend.app.rag.service import RagService
@@ -108,3 +109,8 @@ def get_check_service() -> CheckService:
     if _check_service is None:
         _check_service = CheckService(get_vector_store())
     return _check_service
+
+
+frontend_dist = PROJECT_ROOT / "frontend" / "dist"
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")

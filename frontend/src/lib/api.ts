@@ -1,6 +1,6 @@
 import type { ChatResponse, CheckResponse, CorpusStats, UploadResponse } from "../types";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "http://localhost:8000" : "");
 
 async function request<T>(path: string, init: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, init);
