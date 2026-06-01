@@ -15,6 +15,7 @@ type ChatPanelProps = {
 
 export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -74,6 +75,13 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
     }
   }
 
+  function handleInput(value: string) {
+    setInput(value);
+    if (!textareaRef.current) return;
+    textareaRef.current.style.height = "auto";
+    textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 144)}px`;
+  }
+
   const latestSources = [...messages].reverse().find((message) => message.sources?.length)?.sources ?? [];
 
   return (
@@ -107,37 +115,69 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
         </div>
 
         <div ref={scrollRef} className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-[#fbfbfe] px-4 py-5">
+          {messages.length === 1 && !loading && (
+            <div className="mx-auto max-w-3xl rounded-[28px] border border-violet-100 bg-white p-6 text-center shadow-sm">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-slate-950">Спросите нормативную базу</h3>
+              <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
+                Я найду подтверждение в локальных документах, покажу страницу, раздел и цитату. Если основания нет,
+                откажусь от ответа.
+              </p>
+              <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                {[
+                  "Какие результаты по информатике в 7 классе?",
+                  "Какие требования ФГОС ООО к рабочей программе?",
+                  "Что проверить в плане урока?",
+                  "Какие ограничения СанПиН важны для школы?",
+                ].map((prompt) => (
+                  <button
+                    className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
+                    key={prompt}
+                    onClick={() => handleInput(prompt)}
+                    type="button"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {messages.map((message, index) => (
-            <div
-              className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
-              key={`${message.role}-${index}`}
-            >
-              {message.role === "assistant" && (
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 shadow-sm">
-                  <Sparkles className="h-4 w-4" />
-                </div>
-              )}
-              <div
-                className={`max-w-[84%] rounded-3xl px-4 py-3 text-sm leading-6 shadow-sm ${
-                  message.role === "user"
-                    ? "bg-violet-600 text-white shadow-violet-100"
-                    : "border border-slate-100 bg-white text-slate-800"
-                }`}
-              >
-                <MarkdownMessage content={message.content} dark={message.role === "user"} />
-                {!!message.sources?.length && (
-                  <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3">
-                    {message.sources.slice(0, 4).map((source, sourceIndex) => (
-                      <span
-                        className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"
-                        key={`${source.source_path}-${sourceIndex}`}
-                      >
-                        [{sourceIndex + 1}] {source.document}, стр. {source.page || "-"}
-                      </span>
-                    ))}
+            <div key={`${message.role}-${index}`}>
+              <div className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                {message.role === "assistant" && (
+                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 shadow-sm">
+                    <Sparkles className="h-4 w-4" />
                   </div>
                 )}
+                <div
+                  className={`max-w-[86%] rounded-3xl px-4 py-3 text-sm leading-7 shadow-sm ${
+                    message.role === "user"
+                      ? "bg-violet-600 text-white shadow-violet-100"
+                      : "border border-slate-100 bg-white text-slate-800 md:px-5 md:py-4"
+                  }`}
+                >
+                  <MarkdownMessage content={message.content} dark={message.role === "user"} />
+                </div>
               </div>
+              {message.role === "assistant" && !!message.sources?.length && (
+                <div className="ml-11 mt-3 max-w-4xl">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Источники</p>
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    {message.sources.slice(0, 4).map((source, sourceIndex) => (
+                      <SourceCard
+                        compact
+                        index={sourceIndex + 1}
+                        key={`${source.source_path}-${sourceIndex}`}
+                        source={source}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
 
@@ -170,8 +210,9 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
               <Paperclip className="h-4 w-4" />
             </Button>
             <Textarea
-              className="min-h-14 flex-1 rounded-[22px] border-slate-200 py-3 shadow-none"
-              onChange={(event) => setInput(event.target.value)}
+              ref={textareaRef}
+              className="max-h-36 min-h-14 flex-1 rounded-[28px] border-slate-200 py-3 shadow-sm"
+              onChange={(event) => handleInput(event.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Спросите о ФГОС, ФРП, СанПиН или требованиях к программе..."
               value={input}

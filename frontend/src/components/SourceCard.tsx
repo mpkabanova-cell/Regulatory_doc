@@ -1,28 +1,37 @@
 import { ExternalLink, FileText, Quote } from "lucide-react";
 import { useState } from "react";
 import type { Source } from "../types";
+import { cn } from "../lib/utils";
 import { Badge } from "./ui/badge";
 
 type Props = {
   source: Source;
   index: number;
+  compact?: boolean;
 };
 
-export function SourceCard({ source, index }: Props) {
+export function SourceCard({ source, index, compact = false }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-3xl border border-slate-100 bg-white p-4 shadow-sm transition hover:border-violet-100 hover:shadow-md">
+    <div
+      className={cn(
+        "rounded-3xl border border-slate-100 bg-white shadow-sm transition hover:border-violet-100 hover:shadow-md",
+        compact ? "p-3" : "p-4",
+      )}
+    >
       <div className="flex items-start gap-3">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-emerald-700">
           {index}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="line-clamp-2 text-sm font-semibold leading-5 text-slate-900">{source.document}</p>
+          <p className={cn("line-clamp-2 font-semibold leading-5 text-slate-900", compact ? "text-[13px]" : "text-sm")}>
+            {source.document}
+          </p>
           <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
             {source.section || "Раздел не определен"}
           </p>
-          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+          <div className={cn("flex flex-wrap items-center gap-1.5", compact ? "mt-2" : "mt-3")}>
             <Badge className="border-slate-100 bg-slate-50">стр. {source.page || "-"}</Badge>
             <Badge className="border-violet-100 bg-violet-50 text-violet-700">{source.type}</Badge>
             {source.level && <Badge className="border-slate-100 bg-slate-50">{source.level.toUpperCase()}</Badge>}
