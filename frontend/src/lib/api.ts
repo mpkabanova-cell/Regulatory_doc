@@ -1,14 +1,38 @@
-import type { ChatResponse, CheckResponse, UploadResponse } from "../types";
+import type { ChatResponse, CheckResponse, CorpusStats, UploadResponse } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 async function request<T>(path: string, init: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, init);
   if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(detail || `Request failed: ${response.status}`);
+    const detail = await parseError(response);
+    throw new Error(detail || `Сервер вернул ошибку ${response.status}`);
   }
   return response.json() as Promise<T>;
+}
+
+async function parseError(response: Response): Promise<string> {
+  const text = await response.text();
+  if (!text) return "";
+  try {
+    const data = JSON.parse(text) as { detail?: string };
+    return data.detail || text;
+  } catch {
+    return text;
+  }
+}
+
+export function getStats(): Promise<CorpusStats> {
+  return request<CorpusStats>("/stats", { method: "GET" });
+}
+
+export async function getHealth(): Promise<boolean> {
+  try {
+    await request<{ status: string }>("/health", { method: "GET" });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function sendChat(message: string): Promise<ChatResponse> {

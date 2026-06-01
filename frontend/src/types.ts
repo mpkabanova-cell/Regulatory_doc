@@ -41,3 +41,11 @@ export type CheckResponse = {
   summary: string;
   sources: Source[];
 };
+
+export type CorpusStats = {
+  documents: number;
+  frp: number;
+  fgos: number;
+  sanpin: number;
+  profstandart: number;
+};

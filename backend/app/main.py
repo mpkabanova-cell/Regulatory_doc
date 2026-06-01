@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.checks.service import CheckService
 from backend.app.core.config import get_settings
+from backend.app.documents.metadata import discover_document_paths, infer_document_metadata, load_manifest
 from backend.app.models.schemas import ChatRequest, ChatResponse, CheckRequest, CheckResponse, UploadResponse
 from backend.app.rag.service import RagService
 from backend.app.rag.vector_store import VectorStore
@@ -31,6 +32,19 @@ _check_service: CheckService | None = None
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/stats")
+def stats() -> dict[str, int]:
+    manifest = load_manifest()
+    documents = [infer_document_metadata(path, manifest) for path in discover_document_paths()]
+    return {
+        "documents": len(documents),
+        "frp": sum(1 for document in documents if document.type == "frp"),
+        "fgos": sum(1 for document in documents if document.type == "fgos"),
+        "sanpin": sum(1 for document in documents if document.type == "sanpin"),
+        "profstandart": sum(1 for document in documents if document.type == "profstandart"),
+    }
 
 
 @app.post("/chat", response_model=ChatResponse)

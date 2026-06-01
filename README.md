@@ -9,7 +9,7 @@ Fullstack RAG-система для работы с нормативными д�
 - Frontend: React, Vite, TypeScript, Tailwind CSS.
 - Backend: FastAPI.
 - RAG: OpenRouter или OpenAI chat model + ChromaDB retrieval.
-- Embeddings: локальная `BAAI/bge-m3` или OpenAI `text-embedding-3-small`.
+- Embeddings: локальная `paraphrase-multilingual-MiniLM-L12-v2` или OpenAI `text-embedding-3-small`.
 
 ## Быстрый старт
 
@@ -34,7 +34,7 @@ LLM_PROVIDER=openrouter
 OPENROUTER_API_KEY=sk-or-v1-...
 OPENROUTER_MODEL=openai/gpt-4o-mini
 EMBEDDINGS_PROVIDER=local
-LOCAL_EMBEDDING_MODEL=BAAI/bge-m3
+LOCAL_EMBEDDING_MODEL=paraphrase-multilingual-MiniLM-L12-v2
 CORS_ORIGINS=http://localhost:5173
 ```
 
@@ -78,4 +78,4 @@ npm run dev
 
 ## Деплой
 
-`render.yaml` описывает два сервиса: FastAPI Web Service и Render Static Site. Для production у backend подключен persistent disk под ChromaDB, metadata и uploads. После создания frontend-сервиса укажите его URL в `CORS_ORIGINS`, а URL backend в `VITE_API_URL`.
+`render.yaml` описывает два сервиса: FastAPI Web Service и Render Static Site. Для production у backend подключен persistent disk под ChromaDB, metadata, Hugging Face cache и uploads. Pre-deploy команда запускает `python scripts/update_index.py`, поэтому первый деплой может занять заметное время. После создания frontend-сервиса укажите его URL в `CORS_ORIGINS`, а URL backend в `VITE_API_URL`.
