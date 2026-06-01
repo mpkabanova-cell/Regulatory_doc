@@ -17,6 +17,12 @@ export type ChatResponse = {
   refusal: boolean;
 };
 
+export type ChatFilters = {
+  document_type?: string;
+  level?: string;
+  subject?: string;
+};
+
 export type Message = {
   role: "user" | "assistant";
   content: string;

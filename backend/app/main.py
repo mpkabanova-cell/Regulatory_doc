@@ -50,7 +50,13 @@ def stats() -> dict[str, int]:
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest) -> ChatResponse:
-    return await get_rag_service().chat(request.message, top_k=request.top_k)
+    return await get_rag_service().chat(
+        request.message,
+        top_k=request.top_k,
+        document_type=request.document_type,
+        level=request.level,
+        subject=request.subject,
+    )
 
 
 @app.post("/upload", response_model=UploadResponse)

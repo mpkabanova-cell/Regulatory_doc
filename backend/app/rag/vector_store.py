@@ -33,13 +33,17 @@ class VectorStore:
     def delete_source(self, source_path: str) -> None:
         self.collection.delete(where={"source_path": source_path})
 
-    def query(self, text: str, top_k: int | None = None) -> list[Source]:
+    def query(self, text: str, top_k: int | None = None, where: dict[str, Any] | None = None) -> list[Source]:
         top_k = top_k or self.settings.retrieval_top_k
-        results = self.collection.query(
-            query_texts=[text],
-            n_results=top_k,
-            include=["documents", "metadatas", "distances"],
-        )
+        query_kwargs: dict[str, Any] = {
+            "query_texts": [text],
+            "n_results": top_k,
+            "include": ["documents", "metadatas", "distances"],
+        }
+        if where is not None:
+            query_kwargs["where"] = where
+
+        results = self.collection.query(**query_kwargs)
         return sources_from_results(results)
 
     def count(self) -> int:

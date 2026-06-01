@@ -17,6 +17,9 @@ class Source(BaseModel):
 class ChatRequest(BaseModel):
     message: str = Field(min_length=2)
     top_k: int | None = Field(default=None, ge=1, le=15)
+    document_type: str | None = None
+    level: str | None = None
+    subject: str | None = None
 
 
 class ChatResponse(BaseModel):

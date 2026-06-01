@@ -3,7 +3,7 @@ import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { sendChat } from "../lib/api";
-import type { Message } from "../types";
+import type { ChatFilters, Message } from "../types";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Textarea } from "./ui/textarea";
@@ -16,7 +16,11 @@ const SUGGESTED_PROMPTS = [
   "Какие ограничения СанПиН важны для школы?",
 ];
 
-export function ChatPanel() {
+type ChatPanelProps = {
+  filters: ChatFilters;
+};
+
+export function ChatPanel({ filters }: ChatPanelProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [messages, setMessages] = useState<Message[]>([
@@ -48,7 +52,7 @@ export function ChatPanel() {
     setError("");
     setMessages((current) => [...current, { role: "user", content: message }]);
     try {
-      const response = await sendChat(message);
+      const response = await sendChat(message, filters);
       setMessages((current) => [
         ...current,
         { role: "assistant", content: response.answer, sources: response.sources },
@@ -108,9 +112,9 @@ export function ChatPanel() {
                 </div>
               </div>
               {message.role === "assistant" && !!message.sources?.length && (
-                <div className="ml-11 mt-3 max-w-4xl">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Источники</p>
-                  <div className="grid gap-3 lg:grid-cols-2">
+                <div className="ml-11 mt-3 max-w-[calc(100%-2.75rem)]">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Источники</p>
+                  <div className="space-y-2">
                     {message.sources.slice(0, 4).map((source, sourceIndex) => (
                       <SourceCard
                         compact
@@ -137,7 +141,7 @@ export function ChatPanel() {
           )}
         </div>
 
-        <form className="sticky bottom-0 border-t border-slate-100 bg-white/95 p-4 backdrop-blur" onSubmit={handleSubmit}>
+        <form className="shrink-0 border-t border-slate-100 bg-white/95 p-4 backdrop-blur" onSubmit={handleSubmit}>
           {error && (
             <div className="mb-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {error}
