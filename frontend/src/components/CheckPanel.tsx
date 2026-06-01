@@ -57,10 +57,10 @@ export function CheckPanel() {
   return (
     <div className="h-full min-h-0 overflow-y-auto">
       <div className="mx-auto max-w-5xl space-y-4">
-        <Card className="overflow-hidden border-slate-100 bg-white">
+        <Card className="overflow-hidden rounded-[30px] border-violet-50 bg-white shadow-[0_18px_54px_rgba(93,89,135,0.08)]">
           <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-violet-600 px-3 py-2 text-xs font-semibold text-white shadow-lg shadow-violet-100">
+              <span className="rounded-full bg-gradient-to-r from-[#8b35f6] to-[#563df2] px-3 py-2 text-xs font-semibold text-white shadow-[0_12px_28px_rgba(124,58,237,0.22)]">
                 Загрузить
               </span>
               <span className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
@@ -100,7 +100,7 @@ export function CheckPanel() {
               "mt-6 flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed p-8 text-center transition",
               dragging
                 ? "border-violet-300 bg-violet-50"
-                : "border-violet-200 bg-violet-50/40 hover:border-violet-300 hover:bg-violet-50/80",
+                : "border-violet-200 bg-[#fbf8ff] hover:border-violet-300 hover:bg-violet-50/80",
             )}
             onDragLeave={() => setDragging(false)}
             onDragOver={(event) => {
@@ -122,7 +122,7 @@ export function CheckPanel() {
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <ProgressLabel active={loading} upload={Boolean(upload)} result={Boolean(result)} />
             <Button
-              className="bg-violet-600 text-white shadow-lg shadow-violet-100 hover:bg-violet-700"
+              className="bg-gradient-to-r from-[#8b35f6] to-[#563df2] text-white shadow-[0_12px_28px_rgba(124,58,237,0.22)] hover:from-[#7c2ce4] hover:to-[#4430d8]"
               disabled={!upload || loading}
               onClick={runCheck}
               type="button"
@@ -137,7 +137,7 @@ export function CheckPanel() {
         </Card>
 
         {result && (
-          <Card className="overflow-hidden border-slate-100">
+          <Card className="overflow-hidden rounded-[30px] border-violet-50 shadow-[0_18px_54px_rgba(93,89,135,0.08)]">
             <div className="flex flex-col gap-2 border-b border-slate-100 bg-white px-5 py-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-sm font-semibold text-slate-950">Результаты проверки</p>

@@ -86,7 +86,7 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
 
   return (
     <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[minmax(0,1fr)_390px]">
-      <Card className="flex min-h-0 flex-col overflow-hidden border-slate-100 bg-white">
+      <Card className="flex min-h-0 flex-col overflow-hidden rounded-[28px] border-slate-100 bg-white shadow-[0_18px_54px_rgba(93,89,135,0.08)]">
         <div className="border-b border-slate-100 px-5 py-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
@@ -98,7 +98,7 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
                 <MessageSquareText className="h-3.5 w-3.5 text-violet-500" />
                 Чат
               </span>
-              <span className="inline-flex h-9 items-center gap-2 rounded-full bg-violet-600 px-3 text-xs font-semibold text-white shadow-lg shadow-violet-100">
+              <span className="inline-flex h-9 items-center gap-2 rounded-full bg-gradient-to-r from-[#8b35f6] to-[#563df2] px-3 text-xs font-semibold text-white shadow-[0_12px_28px_rgba(124,58,237,0.22)]">
                 <Search className="h-3.5 w-3.5" />
                 Поиск источников
               </span>
@@ -114,10 +114,10 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
           </div>
         </div>
 
-        <div ref={scrollRef} className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-[#fbfbfe] px-4 py-5">
+        <div ref={scrollRef} className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-gradient-to-b from-[#fcfbff] to-[#f8fafc] px-4 py-5">
           {messages.length === 1 && !loading && (
-            <div className="mx-auto max-w-3xl rounded-[28px] border border-violet-100 bg-white p-6 text-center shadow-sm">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+            <div className="mx-auto max-w-3xl rounded-[30px] border border-violet-100 bg-white/95 p-7 text-center shadow-[0_18px_54px_rgba(111,76,255,0.10)]">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f1e8ff] text-[#7c3aed]">
                 <Sparkles className="h-5 w-5" />
               </div>
               <h3 className="mt-4 text-lg font-semibold text-slate-950">Спросите нормативную базу</h3>
@@ -133,7 +133,7 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
                   "Какие ограничения СанПиН важны для школы?",
                 ].map((prompt) => (
                   <button
-                    className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
+                    className="rounded-2xl border border-violet-100 bg-[#fbf8ff] px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 hover:shadow-sm"
                     key={prompt}
                     onClick={() => handleInput(prompt)}
                     type="button"
@@ -156,8 +156,8 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
                 <div
                   className={`max-w-[86%] rounded-3xl px-4 py-3 text-sm leading-7 shadow-sm ${
                     message.role === "user"
-                      ? "bg-violet-600 text-white shadow-violet-100"
-                      : "border border-slate-100 bg-white text-slate-800 md:px-5 md:py-4"
+                    ? "bg-gradient-to-r from-[#8b35f6] to-[#563df2] text-white shadow-[0_12px_28px_rgba(124,58,237,0.22)]"
+                      : "border border-slate-100 bg-white text-slate-800 shadow-[0_12px_34px_rgba(93,89,135,0.08)] md:px-5 md:py-4"
                   }`}
                 >
                   <MarkdownMessage content={message.content} dark={message.role === "user"} />
@@ -186,14 +186,14 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700">
                 <Sparkles className="h-4 w-4 animate-pulse" />
               </div>
-              <div className="rounded-3xl border border-slate-100 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">
+              <div className="rounded-3xl border border-violet-100 bg-white px-4 py-3 text-sm text-slate-600 shadow-[0_12px_34px_rgba(93,89,135,0.08)]">
                 Ищу релевантные фрагменты и формирую ответ с источниками...
               </div>
             </div>
           )}
         </div>
 
-        <form className="sticky bottom-0 border-t border-slate-100 bg-white p-4" onSubmit={handleSubmit}>
+        <form className="sticky bottom-0 border-t border-slate-100 bg-white/95 p-4 backdrop-blur" onSubmit={handleSubmit}>
           {error && (
             <div className="mb-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {error}
@@ -211,14 +211,14 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
             </Button>
             <Textarea
               ref={textareaRef}
-              className="max-h-36 min-h-14 flex-1 rounded-[28px] border-slate-200 py-3 shadow-sm"
+              className="max-h-36 min-h-14 flex-1 rounded-[28px] border-violet-100 bg-[#fbf8ff] py-3 shadow-[0_12px_30px_rgba(111,76,255,0.08)]"
               onChange={(event) => handleInput(event.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Спросите о ФГОС, ФРП, СанПиН или требованиях к программе..."
               value={input}
             />
             <Button
-              className="bg-violet-600 text-white shadow-lg shadow-violet-100 hover:bg-violet-700"
+              className="bg-gradient-to-r from-[#8b35f6] to-[#563df2] text-white shadow-[0_12px_28px_rgba(124,58,237,0.25)] hover:from-[#7c2ce4] hover:to-[#4430d8]"
               disabled={!input.trim() || loading}
               type="submit"
               size="icon"
@@ -232,7 +232,7 @@ export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
         </form>
       </Card>
 
-      <Card className="hidden min-h-0 flex-col overflow-hidden border-slate-100 bg-white xl:flex">
+      <Card className="hidden min-h-0 flex-col overflow-hidden rounded-[28px] border-slate-100 bg-white shadow-[0_18px_54px_rgba(93,89,135,0.08)] xl:flex">
         <div className="border-b border-slate-100 px-5 py-4">
           <div className="flex items-center justify-between">
             <div>

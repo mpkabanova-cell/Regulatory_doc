@@ -37,18 +37,18 @@ function App() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#f7f3ff] p-4 text-slate-950 md:p-6">
-      <div className="mx-auto flex h-[calc(100vh-32px)] max-w-[1600px] flex-col gap-5 md:h-[calc(100vh-48px)]">
-        <header className="flex min-h-[84px] shrink-0 items-center justify-between rounded-[28px] border border-white/80 bg-white/75 px-4 py-3 shadow-sm backdrop-blur md:px-6">
+    <main className="min-h-screen bg-[#fbf8ff] p-4 text-slate-950 md:p-6">
+      <div className="mx-auto flex h-[calc(100vh-32px)] max-w-[1500px] flex-col gap-4 md:h-[calc(100vh-48px)]">
+        <header className="flex min-h-[74px] shrink-0 items-center justify-between rounded-[30px] border border-white/80 bg-white/70 px-4 py-3 shadow-[0_18px_60px_rgba(111,76,255,0.08)] backdrop-blur-xl md:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <Button className="lg:hidden" size="icon" variant="outline" onClick={() => setSidebarOpen(true)}>
               <Menu className="h-4 w-4" />
             </Button>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-violet-500">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#8f5cf6]">
                 AI • Нормативная база
               </p>
-              <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-slate-950 md:text-2xl">
+              <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-slate-950 md:text-[26px]">
                 Агент работы с документами
               </h1>
               <p className="hidden text-sm text-slate-500 md:block">
@@ -68,7 +68,7 @@ function App() {
           </div>
         </header>
 
-        <div className="grid min-h-0 flex-1 gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+        <div className="grid min-h-0 flex-1 gap-5 lg:grid-cols-[390px_minmax(0,1fr)]">
           {sidebarOpen && (
             <div
               className="fixed inset-0 z-40 bg-slate-950/20 backdrop-blur-sm lg:hidden"
@@ -77,13 +77,13 @@ function App() {
           )}
           <aside
             className={cn(
-              "fixed inset-y-4 left-4 z-50 flex w-[min(340px,calc(100vw-32px))] flex-col overflow-hidden rounded-[30px] border border-violet-100 bg-violet-50/90 p-4 shadow-[0_24px_80px_rgba(109,40,217,0.22)] transition-transform lg:sticky lg:top-6 lg:z-auto lg:h-full lg:w-auto lg:translate-x-0 lg:bg-violet-50/75 lg:shadow-[0_24px_80px_rgba(109,40,217,0.14)]",
+              "fixed inset-y-4 left-4 z-50 flex w-[min(390px,calc(100vw-32px))] flex-col overflow-hidden rounded-[34px] border border-white/80 bg-gradient-to-b from-[#f3eaff] via-[#f7f1ff] to-[#eee6ff] p-4 shadow-[0_28px_90px_rgba(105,63,230,0.22)] transition-transform lg:sticky lg:top-6 lg:z-auto lg:h-full lg:w-auto lg:translate-x-0",
               sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%+32px)]",
             )}
           >
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold text-violet-500">Шаги работы</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9b6df7]">Шаги работы</p>
                 <h2 className="text-lg font-semibold text-slate-950">Параметры запроса</h2>
               </div>
               <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-violet-600 shadow-sm">
@@ -94,9 +94,9 @@ function App() {
               </div>
             </div>
 
-            <Card className="border-white/80 bg-white/90 p-4 shadow-sm">
+            <Card className="border-white/80 bg-white/90 p-4 shadow-[0_18px_46px_rgba(111,76,255,0.08)] backdrop-blur">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#edf3ff] text-[#5577e8]">
                   <Bot className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -120,9 +120,9 @@ function App() {
               </div>
             </Card>
 
-            <Card className="mt-3 border-white/80 bg-white/90 p-4 shadow-sm">
+            <Card className="mt-3 border-white/80 bg-white/90 p-4 shadow-[0_18px_46px_rgba(111,76,255,0.08)] backdrop-blur">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#f2eaff] text-[#7c3aed]">
                   <SlidersHorizontal className="h-5 w-5" />
                 </div>
                 <div>
@@ -137,9 +137,9 @@ function App() {
               </div>
             </Card>
 
-            <Card className="mt-3 border-white/80 bg-white/90 p-4 shadow-sm">
+            <Card className="mt-3 border-white/80 bg-white/90 p-4 shadow-[0_18px_46px_rgba(111,76,255,0.08)] backdrop-blur">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eafff6] text-emerald-600">
                   <Database className="h-5 w-5" />
                 </div>
                 <div>
@@ -168,7 +168,7 @@ function App() {
               </div>
             </Card>
 
-            <Card className="mt-3 border-white/80 bg-white/90 p-4 shadow-sm">
+            <Card className="mt-3 border-white/80 bg-white/90 p-4 shadow-[0_18px_46px_rgba(111,76,255,0.08)] backdrop-blur">
               <p className="text-sm font-semibold text-slate-950">Быстрые темы</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {["План урока", "Требования ФГОС", "Результаты обучения", "КТП", "СанПиН", "Внеурочная деятельность"].map((tag) => (
@@ -179,16 +179,16 @@ function App() {
               </div>
             </Card>
 
-            <Button className="mt-auto h-12 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-200 hover:from-violet-700 hover:to-indigo-700">
+            <Button className="mt-auto h-14 rounded-[22px] bg-gradient-to-r from-[#8b35f6] to-[#5138f2] text-white shadow-[0_18px_40px_rgba(116,64,237,0.32)] hover:from-[#7c2ce4] hover:to-[#4430d8]">
               <CheckCircle2 className="h-4 w-4" />
               {mode === "chat" ? "Задать вопрос базе" : "Проверить материал"}
             </Button>
           </aside>
 
-          <section className="flex min-w-0 flex-col overflow-hidden rounded-[30px] border border-slate-200/80 bg-white shadow-sm">
-            <div className="flex shrink-0 flex-col gap-3 border-b border-slate-100 px-5 py-4 md:flex-row md:items-center md:justify-between">
+          <section className="flex min-w-0 flex-col overflow-hidden rounded-[34px] border border-white/80 bg-white shadow-[0_22px_70px_rgba(93,89,135,0.10)]">
+            <div className="flex shrink-0 flex-col gap-3 border-b border-slate-100 px-6 py-5 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-violet-500">
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#a26af7]">
                   {mode === "chat" ? "Материалы" : "Проверка"}
                 </p>
                 <h2 className="mt-1 text-xl font-semibold text-slate-950">
@@ -198,7 +198,7 @@ function App() {
                   Фильтры: Все документы • Любой уровень • Любой предмет
                 </p>
               </div>
-              <div className="flex rounded-2xl bg-slate-100 p-1">
+              <div className="flex rounded-[20px] bg-[#f6f3fb] p-1 shadow-inner">
                 <Button
                   className="rounded-xl"
                   variant={mode === "chat" ? "outline" : "ghost"}
@@ -218,7 +218,7 @@ function App() {
               </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-hidden bg-slate-50/60 p-4">
+            <div className="min-h-0 flex-1 overflow-hidden bg-[#fbfbfe] p-5">
               {mode === "chat" ? <ChatPanel onOpenCheck={() => setMode("check")} /> : <CheckPanel />}
             </div>
           </section>

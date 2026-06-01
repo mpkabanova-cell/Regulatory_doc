@@ -16,12 +16,12 @@ export function SourceCard({ source, index, compact = false }: Props) {
   return (
     <div
       className={cn(
-        "rounded-3xl border border-slate-100 bg-white shadow-sm transition hover:border-violet-100 hover:shadow-md",
+        "rounded-3xl border border-violet-50 bg-white shadow-[0_10px_28px_rgba(93,89,135,0.06)] transition hover:border-violet-100 hover:shadow-[0_16px_34px_rgba(111,76,255,0.12)]",
         compact ? "p-3" : "p-4",
       )}
     >
       <div className="flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-emerald-700">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-emerald-700 shadow-sm">
           {index}
         </span>
         <div className="min-w-0 flex-1">
@@ -38,7 +38,7 @@ export function SourceCard({ source, index, compact = false }: Props) {
           </div>
         </div>
         <button
-          className="shrink-0 rounded-full bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-500 transition hover:bg-violet-50 hover:text-violet-700"
+          className="shrink-0 rounded-full bg-[#f8f5ff] px-3 py-1 text-xs font-semibold text-violet-600 transition hover:bg-violet-100 hover:text-violet-800"
           onClick={() => setOpen((value) => !value)}
           type="button"
         >
@@ -47,7 +47,7 @@ export function SourceCard({ source, index, compact = false }: Props) {
       </div>
 
       {open && (
-        <div className="mt-4 rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm text-slate-700">
+        <div className="mt-4 rounded-2xl border border-violet-100 bg-[#fbf8ff] p-3 text-sm text-slate-700">
           <div className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-500">
             <Quote className="h-3.5 w-3.5" />
             Цитата из источника
