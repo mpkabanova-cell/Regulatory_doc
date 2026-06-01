@@ -57,10 +57,25 @@ export function CheckPanel() {
   return (
     <div className="h-full min-h-0 overflow-y-auto">
       <div className="mx-auto max-w-5xl space-y-4">
-        <Card className="p-6">
+        <Card className="overflow-hidden border-slate-100 bg-white">
+          <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full bg-violet-600 px-3 py-2 text-xs font-semibold text-white shadow-lg shadow-violet-100">
+                Загрузить
+              </span>
+              <span className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
+                Проверить
+              </span>
+              <span className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
+                Результат
+              </span>
+            </div>
+            <Badge className="border-emerald-100 bg-emerald-50 text-emerald-700">compliance check</Badge>
+          </div>
+
+          <div className="p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700">compliance check</Badge>
               <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
                 Проверка учебного документа
               </h2>
@@ -70,7 +85,7 @@ export function CheckPanel() {
               </p>
             </div>
             <select
-              className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 shadow-sm outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+              className="h-11 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-800 shadow-sm outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
               onChange={(event) => setMaterialType(event.target.value)}
               value={materialType}
             >
@@ -85,7 +100,7 @@ export function CheckPanel() {
               "mt-6 flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed p-8 text-center transition",
               dragging
                 ? "border-violet-300 bg-violet-50"
-                : "border-slate-300 bg-slate-50 hover:border-violet-300 hover:bg-violet-50/60",
+                : "border-violet-200 bg-violet-50/40 hover:border-violet-300 hover:bg-violet-50/80",
             )}
             onDragLeave={() => setDragging(false)}
             onDragOver={(event) => {
@@ -94,7 +109,7 @@ export function CheckPanel() {
             }}
             onDrop={handleDrop}
           >
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-violet-700 shadow-sm">
               {upload ? <CheckCircle2 className="h-6 w-6 text-emerald-600" /> : <FileUp className="h-6 w-6" />}
             </div>
             <p className="mt-4 text-sm font-semibold text-slate-900">
@@ -106,18 +121,24 @@ export function CheckPanel() {
 
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <ProgressLabel active={loading} upload={Boolean(upload)} result={Boolean(result)} />
-            <Button disabled={!upload || loading} onClick={runCheck} type="button">
+            <Button
+              className="bg-violet-600 text-white shadow-lg shadow-violet-100 hover:bg-violet-700"
+              disabled={!upload || loading}
+              onClick={runCheck}
+              type="button"
+            >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
               Проверить документ
             </Button>
           </div>
 
           {error && <p className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{error}</p>}
+          </div>
         </Card>
 
         {result && (
-          <Card className="overflow-hidden">
-            <div className="flex flex-col gap-2 border-b border-slate-200 bg-white px-5 py-4 md:flex-row md:items-center md:justify-between">
+          <Card className="overflow-hidden border-slate-100">
+            <div className="flex flex-col gap-2 border-b border-slate-100 bg-white px-5 py-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-sm font-semibold text-slate-950">Результаты проверки</p>
                 <p className="mt-1 text-sm text-slate-500">{result.summary}</p>
@@ -126,7 +147,7 @@ export function CheckPanel() {
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[860px] text-left text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <thead className="bg-violet-50/50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
                     <th className="px-5 py-3 font-medium">Требование</th>
                     <th className="px-5 py-3 font-medium">Статус</th>

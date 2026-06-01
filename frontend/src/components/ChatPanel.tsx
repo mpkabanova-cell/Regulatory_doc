@@ -1,4 +1,4 @@
-import { Paperclip, SendHorizontal, Sparkles } from "lucide-react";
+import { FileSearch, MessageSquareText, Paperclip, Search, SendHorizontal, Sparkles } from "lucide-react";
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -9,7 +9,11 @@ import { Card } from "./ui/card";
 import { Textarea } from "./ui/textarea";
 import { SourceCard } from "./SourceCard";
 
-export function ChatPanel() {
+type ChatPanelProps = {
+  onOpenCheck?: () => void;
+};
+
+export function ChatPanel({ onOpenCheck }: ChatPanelProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -73,35 +77,51 @@ export function ChatPanel() {
   const latestSources = [...messages].reverse().find((message) => message.sources?.length)?.sources ?? [];
 
   return (
-    <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-      <Card className="flex min-h-0 flex-col overflow-hidden">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
-          <div>
-            <p className="text-sm font-semibold text-slate-950">Нормативный чат</p>
-            <p className="text-xs text-slate-500">Ответы только по найденным фрагментам базы</p>
-          </div>
-          <div className="hidden items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 sm:flex">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            индекс активен
+    <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[minmax(0,1fr)_390px]">
+      <Card className="flex min-h-0 flex-col overflow-hidden border-slate-100 bg-white">
+        <div className="border-b border-slate-100 px-5 py-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-950">План ответа</p>
+              <p className="text-xs text-slate-500">Поиск по локальной нормативной базе с цитированием</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm">
+                <MessageSquareText className="h-3.5 w-3.5 text-violet-500" />
+                Чат
+              </span>
+              <span className="inline-flex h-9 items-center gap-2 rounded-full bg-violet-600 px-3 text-xs font-semibold text-white shadow-lg shadow-violet-100">
+                <Search className="h-3.5 w-3.5" />
+                Поиск источников
+              </span>
+              <button
+                className="inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:border-violet-200 hover:text-violet-700"
+                onClick={onOpenCheck}
+                type="button"
+              >
+                <FileSearch className="h-3.5 w-3.5" />
+                Проверить документ
+              </button>
+            </div>
           </div>
         </div>
 
-        <div ref={scrollRef} className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/70 px-4 py-5">
+        <div ref={scrollRef} className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-[#fbfbfe] px-4 py-5">
           {messages.map((message, index) => (
             <div
               className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
               key={`${message.role}-${index}`}
             >
               {message.role === "assistant" && (
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white shadow-sm">
+                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 shadow-sm">
                   <Sparkles className="h-4 w-4" />
                 </div>
               )}
               <div
-                className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm ${
+                className={`max-w-[84%] rounded-3xl px-4 py-3 text-sm leading-6 shadow-sm ${
                   message.role === "user"
-                    ? "bg-slate-950 text-white"
-                    : "border border-slate-200 bg-white text-slate-800"
+                    ? "bg-violet-600 text-white shadow-violet-100"
+                    : "border border-slate-100 bg-white text-slate-800"
                 }`}
               >
                 <MarkdownMessage content={message.content} dark={message.role === "user"} />
@@ -123,17 +143,17 @@ export function ChatPanel() {
 
           {loading && (
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700">
                 <Sparkles className="h-4 w-4 animate-pulse" />
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">
+              <div className="rounded-3xl border border-slate-100 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">
                 Ищу релевантные фрагменты и формирую ответ с источниками...
               </div>
             </div>
           )}
         </div>
 
-        <form className="sticky bottom-0 border-t border-slate-200 bg-white p-4" onSubmit={handleSubmit}>
+        <form className="sticky bottom-0 border-t border-slate-100 bg-white p-4" onSubmit={handleSubmit}>
           {error && (
             <div className="mb-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {error}
@@ -150,13 +170,18 @@ export function ChatPanel() {
               <Paperclip className="h-4 w-4" />
             </Button>
             <Textarea
-              className="min-h-14 flex-1 py-3"
+              className="min-h-14 flex-1 rounded-[22px] border-slate-200 py-3 shadow-none"
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Спросите о ФГОС, ФРП, СанПиН или требованиях к программе..."
               value={input}
             />
-            <Button disabled={!input.trim() || loading} type="submit" size="icon">
+            <Button
+              className="bg-violet-600 text-white shadow-lg shadow-violet-100 hover:bg-violet-700"
+              disabled={!input.trim() || loading}
+              type="submit"
+              size="icon"
+            >
               <SendHorizontal className="h-4 w-4" />
             </Button>
           </div>
@@ -166,10 +191,17 @@ export function ChatPanel() {
         </form>
       </Card>
 
-      <Card className="hidden min-h-0 flex-col overflow-hidden xl:flex">
-        <div className="border-b border-slate-200 px-5 py-4">
-          <p className="text-sm font-semibold text-slate-950">Источники</p>
-          <p className="mt-1 text-xs text-slate-500">Цитаты из найденных документов</p>
+      <Card className="hidden min-h-0 flex-col overflow-hidden border-slate-100 bg-white xl:flex">
+        <div className="border-b border-slate-100 px-5 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-950">Подобранные источники</p>
+              <p className="mt-1 text-xs text-slate-500">Показаны релевантные ссылки, если они доступны</p>
+            </div>
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-500">
+              {latestSources.length ? `Показано: ${latestSources.length}` : "Пусто"}
+            </span>
+          </div>
         </div>
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
           {latestSources.length ? (
