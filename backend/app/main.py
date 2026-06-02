@@ -32,11 +32,13 @@ _check_service: CheckService | None = None
 
 
 @app.get("/health")
+@app.get("/api/health", include_in_schema=False)
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
 @app.get("/stats")
+@app.get("/api/stats", include_in_schema=False)
 def stats() -> dict[str, int]:
     manifest = load_manifest()
     documents = [infer_document_metadata(path, manifest) for path in discover_document_paths()]
@@ -50,6 +52,7 @@ def stats() -> dict[str, int]:
 
 
 @app.post("/chat", response_model=ChatResponse)
+@app.post("/api/chat", response_model=ChatResponse, include_in_schema=False)
 async def chat(request: ChatRequest) -> ChatResponse:
     return await get_rag_service().chat(
         request.message,
@@ -62,6 +65,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
 
 
 @app.post("/upload", response_model=UploadResponse)
+@app.post("/api/upload", response_model=UploadResponse, include_in_schema=False)
 async def upload(file: UploadFile = File(...)) -> UploadResponse:
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in {".pdf", ".docx"}:
@@ -85,6 +89,7 @@ async def upload(file: UploadFile = File(...)) -> UploadResponse:
 
 
 @app.post("/check", response_model=CheckResponse)
+@app.post("/api/check", response_model=CheckResponse, include_in_schema=False)
 async def check(request: CheckRequest) -> CheckResponse:
     upload_path = resolve_upload(request.upload_id)
     return await get_check_service().check_document(upload_path, request.document_type)
