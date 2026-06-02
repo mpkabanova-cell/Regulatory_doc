@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - .env
+    environment:
+      PORT: 8000
+      EMBEDDINGS_PROVIDER: keyword
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      UPLOADS_DIR: /app/backend/uploads
+    expose:
+      - "8000"
+    volumes:
+      - backend_uploads:/app/backend/uploads
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  backend_uploads:

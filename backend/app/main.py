@@ -17,10 +17,11 @@ from backend.app.rag.store_factory import RetrievalStore, create_retrieval_store
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name)
+cors_origins = settings.cors_origin_list
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origin_list,
-    allow_credentials=True,
+    allow_origins=cors_origins,
+    allow_credentials="*" not in cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

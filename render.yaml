@@ -16,4 +16,4 @@ services:
       - key: EMBEDDINGS_PROVIDER
         value: keyword
       - key: CORS_ORIGINS
-        value: https://regulatory-rag.onrender.com
+        value: "*"
