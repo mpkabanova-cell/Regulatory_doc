@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import logging
 from typing import Protocol
 
 from backend.app.core.config import get_settings
 from backend.app.documents.chunking import DocumentChunk
 from backend.app.models.schemas import Source
 from backend.app.rag.keyword_store import KeywordStore
+
+
+logger = logging.getLogger(__name__)
 
 
 class RetrievalStore(Protocol):
@@ -20,9 +24,19 @@ class RetrievalStore(Protocol):
 
 def create_retrieval_store() -> RetrievalStore:
     settings = get_settings()
-    if settings.embeddings_provider.lower() == "keyword":
+    provider = settings.embeddings_provider.lower()
+    if provider == "keyword":
         return KeywordStore()
 
     from backend.app.rag.vector_store import VectorStore
 
-    return VectorStore()
+    try:
+        return VectorStore()
+    except ValueError as exc:
+        if provider == "local" and "sentence_transformers" in str(exc):
+            logger.warning(
+                "sentence-transformers is not installed; falling back to keyword retrieval. "
+                "Set EMBEDDINGS_PROVIDER=keyword on low-memory deployments."
+            )
+            return KeywordStore()
+        raise

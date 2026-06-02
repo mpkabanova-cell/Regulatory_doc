@@ -163,6 +163,8 @@ CORS_ORIGINS=https://your-service-name.onrender.com
 
 В Docker build автоматически запускается `python scripts/parse_documents.py`, поэтому `metadata/chunks.jsonl` попадает в image. На Render включен `EMBEDDINGS_PROVIDER=keyword`, чтобы сервис не загружал `sentence-transformers` и не падал с `Ran out of memory (used over 512MB)`.
 
+Если сервис уже был создан раньше, проверьте переменные окружения в Render Dashboard: `EMBEDDINGS_PROVIDER` должен быть `keyword`. Старое значение `local` заставит backend пытаться загрузить `sentence-transformers`.
+
 После deploy проверьте:
 
 ```text
