@@ -12,7 +12,7 @@ from backend.app.core.config import PROJECT_ROOT, get_settings
 from backend.app.documents.metadata import discover_document_paths, infer_document_metadata, load_manifest
 from backend.app.models.schemas import ChatRequest, ChatResponse, CheckRequest, CheckResponse, UploadResponse
 from backend.app.rag.service import RagService
-from backend.app.rag.vector_store import VectorStore
+from backend.app.rag.store_factory import RetrievalStore, create_retrieval_store
 
 
 settings = get_settings()
@@ -25,7 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-_vector_store: VectorStore | None = None
+_vector_store: RetrievalStore | None = None
 _rag_service: RagService | None = None
 _check_service: CheckService | None = None
 
@@ -97,10 +97,10 @@ def resolve_upload(upload_id: str) -> Path:
     raise HTTPException(status_code=404, detail="Загруженный файл не найден.")
 
 
-def get_vector_store() -> VectorStore:
+def get_vector_store() -> RetrievalStore:
     global _vector_store
     if _vector_store is None:
-        _vector_store = VectorStore()
+        _vector_store = create_retrieval_store()
     return _vector_store
 
 

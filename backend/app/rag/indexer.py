@@ -4,15 +4,14 @@ import json
 from pathlib import Path
 
 from backend.app.core.config import get_settings
-from backend.app.documents.chunking import DocumentChunk
 from backend.app.documents.pipeline import build_chunks, parse_all_documents
-from backend.app.rag.vector_store import VectorStore
+from backend.app.rag.store_factory import RetrievalStore, create_retrieval_store
 
 
 class DocumentIndexer:
-    def __init__(self, vector_store: VectorStore | None = None) -> None:
+    def __init__(self, vector_store: RetrievalStore | None = None) -> None:
         self.settings = get_settings()
-        self.vector_store = vector_store or VectorStore()
+        self.vector_store = vector_store or create_retrieval_store()
         self.state_path = self.settings.metadata_dir / "indexed_files.json"
 
     def index_all(self, incremental: bool = True) -> dict[str, int]:

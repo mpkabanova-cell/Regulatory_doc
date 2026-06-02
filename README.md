@@ -40,16 +40,24 @@ source .venv/bin/activate
 pip install -r backend/requirements.txt
 ```
 
-3. Для OpenRouter + локальных embeddings заполните `.env`:
+Если нужен локальный embedding-поиск через `sentence-transformers`, установите расширенный набор:
+
+```bash
+pip install -r backend/requirements-local.txt
+```
+
+3. Для OpenRouter + легкого поиска заполните `.env`:
 
 ```env
 LLM_PROVIDER=openrouter
 OPENROUTER_API_KEY=sk-or-v1-...
 OPENROUTER_MODEL=openai/gpt-4o-mini
-EMBEDDINGS_PROVIDER=local
+EMBEDDINGS_PROVIDER=keyword
 LOCAL_EMBEDDING_MODEL=paraphrase-multilingual-MiniLM-L12-v2
 CORS_ORIGINS=http://localhost:5173
 ```
+
+Для Render/free используйте `EMBEDDINGS_PROVIDER=keyword`: этот режим не загружает локальную embedding-модель и укладывается в 512 MB RAM. Для локальной машины или VPS можно оставить `EMBEDDINGS_PROVIDER=local`, если хватает памяти.
 
 4. Постройте или обновите индекс:
 
@@ -76,8 +84,9 @@ npm run dev
 ## Скрипты документов
 
 - `python scripts/parse_documents.py` извлекает текст и готовит `metadata/documents.jsonl` и `metadata/chunks.jsonl`.
-- `python scripts/ingest_documents.py` пересоздает индекс для всех документов.
+- `python scripts/ingest_documents.py` пересоздает ChromaDB-индекс для всех документов.
 - `python scripts/update_index.py` индексирует новые и измененные документы без дублей.
+- При `EMBEDDINGS_PROVIDER=keyword` ChromaDB не используется: поиск идет по подготовленному `metadata/chunks.jsonl`.
 
 ## Поведение чата
 
@@ -104,7 +113,7 @@ npm run dev
 - `level`: `noo`, `ooo`, `soo`.
 - `subject`: русское название предмета, например `Информатика`.
 - Если выбран `Все документы`, поиск идет по всей базе; уровень и предмет используются как контекст для ответа.
-- Для `ФРП` уровень и предмет применяются как точные ChromaDB-фильтры, потому что эти метаданные есть у ФРП.
+- Для `ФРП` уровень и предмет применяются как точные фильтры по метаданным, потому что эти данные есть у ФРП.
 - Если пользователь пишет продолжение диалога, backend берет предыдущий содержательный вопрос как retrieval-запрос.
 - Источники ранжируются с учетом совпадения предмета и ступени.
 - Цитаты нормализуются так, чтобы не начинаться с середины слова или середины пункта.
@@ -136,8 +145,8 @@ npm --prefix frontend run build
 Проект деплоится как один Render Web Service. FastAPI отдает API и собранный React frontend из `frontend/dist`.
 
 1. Запушьте проект в GitHub.
-2. В Render выберите `New` -> `Blueprint` и подключите репозиторий.
-3. Render прочитает `render.yaml` и создаст сервис `regulatory-rag`.
+2. В Render выберите `New` -> `Blueprint` и подключите репозиторий или создайте `Web Service` из Dockerfile вручную.
+3. Render прочитает `render.yaml` и создаст бесплатный сервис `regulatory-rag`.
 4. В переменных окружения сервиса задайте секрет:
 
 ```env
@@ -152,7 +161,7 @@ CORS_ORIGINS=https://your-service-name.onrender.com
 
 6. Запустите deploy.
 
-Первый deploy может быть долгим: `preDeployCommand` запускает `python scripts/update_index.py`, скачивает embedding-модель и строит ChromaDB индекс на persistent disk.
+В Docker build автоматически запускается `python scripts/parse_documents.py`, поэтому `metadata/chunks.jsonl` попадает в image. На Render включен `EMBEDDINGS_PROVIDER=keyword`, чтобы сервис не загружал `sentence-transformers` и не падал с `Ran out of memory (used over 512MB)`.
 
 После deploy проверьте:
 
@@ -162,8 +171,4 @@ https://your-service-name.onrender.com/stats
 https://your-service-name.onrender.com
 ```
 
-Если индексация не успеет завершиться на первом deploy, откройте Render Shell и вручную выполните:
-
-```bash
-python scripts/update_index.py
-```
+Если меняете документы, просто сделайте новый deploy: чанки будут пересобраны на этапе Docker build.

@@ -4,13 +4,13 @@ from backend.app.core.config import get_settings
 from backend.app.models.schemas import ChatHistoryMessage, ChatResponse, Source
 from backend.app.rag.llm_client import create_llm_client
 from backend.app.rag.prompts import CHAT_SYSTEM_PROMPT, METHODIST_SYSTEM_PROMPT, REFUSAL_MESSAGE
-from backend.app.rag.vector_store import VectorStore
+from backend.app.rag.store_factory import RetrievalStore, create_retrieval_store
 
 
 class RagService:
-    def __init__(self, vector_store: VectorStore | None = None) -> None:
+    def __init__(self, vector_store: RetrievalStore | None = None) -> None:
         self.settings = get_settings()
-        self.vector_store = vector_store or VectorStore()
+        self.vector_store = vector_store or create_retrieval_store()
         self.client = create_llm_client(self.settings)
 
     async def chat(

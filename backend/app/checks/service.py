@@ -8,13 +8,13 @@ from backend.app.documents.extract import extract_document_text
 from backend.app.models.schemas import CheckResponse, ComplianceRow, Source
 from backend.app.rag.llm_client import create_llm_client
 from backend.app.rag.prompts import CHECK_SYSTEM_PROMPT
-from backend.app.rag.vector_store import VectorStore
+from backend.app.rag.store_factory import RetrievalStore, create_retrieval_store
 
 
 class CheckService:
-    def __init__(self, vector_store: VectorStore | None = None) -> None:
+    def __init__(self, vector_store: RetrievalStore | None = None) -> None:
         self.settings = get_settings()
-        self.vector_store = vector_store or VectorStore()
+        self.vector_store = vector_store or create_retrieval_store()
         self.client = create_llm_client(self.settings)
 
     async def check_document(self, upload_path: Path, document_type: str) -> CheckResponse:
