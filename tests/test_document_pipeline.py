@@ -4,6 +4,7 @@ from backend.app.documents.chunking import chunk_pages
 from backend.app.documents.extract import PageText
 from backend.app.documents.metadata import infer_document_metadata
 from backend.app.models.schemas import Source
+from backend.app.rag.prompts import METHODIST_SYSTEM_PROMPT
 from backend.app.rag.service import build_clarification_question, infer_level, infer_subject, rank_and_dedupe_sources
 from backend.app.rag.vector_store import trim_quote
 
@@ -104,3 +105,10 @@ def test_does_not_clarify_when_subject_and_level_are_known() -> None:
     )
 
     assert clarification is None
+
+
+def test_methodist_prompt_keeps_core_work_directions_and_normative_limit() -> None:
+    assert "Создание текстов" in METHODIST_SYSTEM_PROMPT
+    assert "Планирование учебного процесса" in METHODIST_SYSTEM_PROMPT
+    assert "Методические рекомендации" in METHODIST_SYSTEM_PROMPT
+    assert "Нормативные выводы" in METHODIST_SYSTEM_PROMPT
