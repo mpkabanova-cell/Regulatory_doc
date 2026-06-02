@@ -23,6 +23,8 @@ type ChatPanelProps = {
 export function ChatPanel({ filters }: ChatPanelProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const filtersRef = useRef(filters);
+  const messagesRef = useRef<Message[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -36,7 +38,40 @@ export function ChatPanel({ filters }: ChatPanelProps) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    messagesRef.current = messages;
+  }, [messages]);
+
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    if (loading) {
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+      return;
+    }
+
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === "assistant") {
+      const assistantMessages = container.querySelectorAll<HTMLElement>("[data-message-role='assistant']");
+      const latestAssistantMessage = assistantMessages[assistantMessages.length - 1];
+      if (latestAssistantMessage) {
+        window.requestAnimationFrame(() => {
+          const containerRect = container.getBoundingClientRect();
+          const messageRect = latestAssistantMessage.getBoundingClientRect();
+          const top = container.scrollTop + messageRect.top - containerRect.top - 12;
+          container.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
+        });
+      }
+      return;
+    }
+
+    if (lastMessage?.role === "user") {
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+    }
   }, [messages, loading]);
 
   async function handleSubmit(event: FormEvent) {
@@ -52,7 +87,7 @@ export function ChatPanel({ filters }: ChatPanelProps) {
     setError("");
     setMessages((current) => [...current, { role: "user", content: message }]);
     try {
-      const response = await sendChat(message, filters);
+      const response = await sendChat(message, filtersRef.current, messagesRef.current);
       setMessages((current) => [
         ...current,
         { role: "assistant", content: response.answer, sources: response.sources },
@@ -61,7 +96,7 @@ export function ChatPanel({ filters }: ChatPanelProps) {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Не удалось получить ответ. Проверьте, что backend запущен на http://localhost:8000.";
+          : "Не удалось получить ответ. Проверьте, что сервер запущен на http://localhost:8000.";
       setError(errorMessage);
       setMessages((current) => [
         ...current,
@@ -94,7 +129,7 @@ export function ChatPanel({ filters }: ChatPanelProps) {
       <Card className="flex h-full min-h-0 flex-col overflow-hidden rounded-[28px] border-slate-100 bg-white shadow-[0_18px_54px_rgba(93,89,135,0.08)]">
         <div ref={scrollRef} className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-gradient-to-b from-[#fcfbff] to-[#f8fafc] px-4 py-5">
           {messages.map((message, index) => (
-            <div key={`${message.role}-${index}`}>
+            <div data-message-role={message.role} key={`${message.role}-${index}`}>
               <div className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                 {message.role === "assistant" && (
                   <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 shadow-sm">
@@ -180,7 +215,7 @@ export function ChatPanel({ filters }: ChatPanelProps) {
             </Button>
           </div>
           <p className="mt-2 text-xs text-slate-400">
-            Enter отправляет, Shift+Enter переносит строку. Первый ответ может занять 15–30 секунд.
+            Ввод отправляет сообщение. Первый ответ может занять 15–30 секунд.
           </p>
         </form>
       </Card>

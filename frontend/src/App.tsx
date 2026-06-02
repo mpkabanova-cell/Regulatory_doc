@@ -20,6 +20,75 @@ type FilterOption = {
   value: string;
 };
 
+const SUBJECTS_BY_LEVEL: Record<string, string[]> = {
+  noo: [
+    "Английский язык",
+    "ИЗО",
+    "Испанский язык",
+    "Китайский язык",
+    "Литературное чтение",
+    "Математика",
+    "Музыка",
+    "Немецкий язык",
+    "ОРКСЭ",
+    "Окружающий мир",
+    "Русский язык",
+    "Труд технология",
+    "Физическая культура",
+    "Французский язык",
+  ],
+  ooo: [
+    "Английский язык",
+    "Биология",
+    "Второй иностранный английский",
+    "Второй иностранный испанский",
+    "Второй иностранный китайский",
+    "Второй иностранный немецкий",
+    "Второй иностранный французский",
+    "География",
+    "ИЗО",
+    "Информатика",
+    "История",
+    "Литература",
+    "Математика",
+    "Музыка",
+    "Немецкий язык",
+    "ОБЗР",
+    "Обществознание",
+    "Русский язык",
+    "Труд технология",
+    "Физика",
+    "Физическая культура",
+    "Французский язык",
+    "Химия",
+  ],
+  soo: [
+    "Английский язык",
+    "Биология",
+    "Второй иностранный английский",
+    "Второй иностранный испанский",
+    "Второй иностранный китайский",
+    "Второй иностранный немецкий",
+    "Второй иностранный французский",
+    "География",
+    "Информатика",
+    "История",
+    "Литература",
+    "Математика",
+    "Немецкий язык",
+    "ОБЗР",
+    "Обществознание",
+    "Русский язык",
+    "Физика",
+    "Физическая культура",
+    "Химия",
+  ],
+};
+
+const ALL_SUBJECTS = Array.from(new Set(Object.values(SUBJECTS_BY_LEVEL).flat())).sort((first, second) =>
+  first.localeCompare(second, "ru"),
+);
+
 function App() {
   const [mode, setMode] = useState<Mode>("chat");
   const [stats, setStats] = useState<CorpusStats | null>(null);
@@ -31,53 +100,60 @@ function App() {
     void getStats().then(setStats).catch(() => setStats(null));
   }, []);
 
+  const availableSubjects = filters.level ? SUBJECTS_BY_LEVEL[filters.level] ?? ALL_SUBJECTS : ALL_SUBJECTS;
+
+  useEffect(() => {
+    if (filters.subject && !availableSubjects.includes(filters.subject)) {
+      setFilters((current) => ({ ...current, subject: undefined }));
+    }
+  }, [availableSubjects, filters.subject]);
+
   return (
-    <main className="h-screen overflow-hidden bg-[#fbf8ff] p-4 text-slate-950 md:p-5">
-      <div className="mx-auto flex h-full max-w-[1480px] flex-col gap-4 overflow-hidden">
-        <header className="flex h-[88px] shrink-0 items-center justify-between gap-5 rounded-[28px] bg-white/90 px-5 py-3 shadow-[0_18px_60px_rgba(118,82,180,0.10)] ring-1 ring-violet-100/70 backdrop-blur">
-          <div className="min-w-0 shrink">
-            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-violet-500">AI • Нормативная база</p>
-            <h1 className="mt-1 truncate text-[22px] font-semibold leading-tight tracking-tight text-slate-950">
+    <main className="h-screen overflow-hidden bg-[#fbf8ff] p-3 text-slate-950 md:p-4">
+      <div className="mx-auto flex h-full max-w-[1480px] flex-col gap-3 overflow-hidden">
+        <header className="flex h-[64px] shrink-0 items-center justify-between gap-4 rounded-[24px] bg-white/90 px-4 py-2 shadow-[0_14px_44px_rgba(118,82,180,0.09)] ring-1 ring-violet-100/70 backdrop-blur">
+          <div className="flex min-w-0 shrink items-center gap-3">
+            <span className="hidden rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-violet-500 sm:inline-flex">
+              ИИ-база
+            </span>
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-semibold leading-6 tracking-tight text-slate-950">
               Агент работы с документами
-            </h1>
-            <p className="mt-0.5 truncate text-sm text-slate-500">Поиск по ФГОС, ФРП, СанПиН и профстандартам</p>
+              </h1>
+              <p className="truncate text-xs text-slate-500">ФГОС, ФРП, СанПиН и профстандарты</p>
+            </div>
           </div>
 
-          <div className="hidden min-w-0 shrink-0 items-center gap-3 rounded-[22px] bg-slate-50 px-3 py-2 ring-1 ring-slate-100 lg:flex">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
-              <Database className="h-5 w-5" />
+          <div className="hidden min-w-0 shrink-0 items-center gap-2 rounded-[20px] bg-slate-50 px-2.5 py-1.5 ring-1 ring-slate-100 lg:flex">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <Database className="h-4 w-4" />
             </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold leading-5 text-slate-950">Локальная нормативная база</p>
-              <p className="truncate text-xs leading-4 text-slate-500">ChromaDB индекс</p>
-            </div>
-            <div className="h-8 w-px bg-slate-200" />
+            <span className="whitespace-nowrap text-xs font-semibold text-slate-700">База</span>
             <HeaderMetric label="ФРП" value={stats?.frp ?? "—"} />
             <HeaderMetric label="ФГОС" value={stats?.fgos ?? "—"} />
             <HeaderMetric label="СанПиН" value={stats?.sanpin ?? "—"} />
-            <div className="h-8 w-px bg-slate-200" />
-            <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-100">
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-100">
               <span
                 className={cn(
-                  "h-2.5 w-2.5 rounded-full",
+                  "h-2 w-2 rounded-full",
                   healthy === null && "bg-amber-400",
                   healthy === true && "bg-emerald-500",
                   healthy === false && "bg-rose-500",
                 )}
               />
-              Статус: {healthy === null ? "Проверка базы" : healthy ? "База готова" : "Ошибка базы"}
+              {healthy === null ? "Проверка" : healthy ? "Готова" : "Ошибка"}
             </span>
           </div>
         </header>
 
-        <div className="grid min-h-0 flex-1 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
-          <aside className="flex min-h-0 flex-col overflow-y-auto rounded-[30px] bg-gradient-to-b from-[#f3eaff] via-[#f8f3ff] to-[#ede5ff] p-4 shadow-[0_24px_80px_rgba(111,76,255,0.16)] ring-1 ring-white/80">
-            <div className="mb-4 flex items-center justify-between">
+        <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <aside className="flex min-h-0 flex-col overflow-y-auto rounded-[26px] bg-gradient-to-b from-[#f3eaff] via-[#f8f3ff] to-[#ede5ff] p-3 shadow-[0_20px_64px_rgba(111,76,255,0.14)] ring-1 ring-white/80">
+            <div className="mb-3 flex items-center justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-500">Шаги работы</p>
-                <h2 className="text-lg font-semibold text-slate-950">Параметры запроса</h2>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-500">Фильтры</p>
+                <h2 className="text-base font-semibold text-slate-950">Параметры запроса</h2>
               </div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-violet-600 shadow-sm ring-1 ring-violet-100">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-violet-600 shadow-sm ring-1 ring-violet-100">
                 <Boxes className="h-4 w-4" />
               </div>
             </div>
@@ -120,11 +196,7 @@ function App() {
                   label="Предмет"
                   options={[
                     { label: "Любой", value: "" },
-                    { label: "Информатика", value: "Информатика" },
-                    { label: "Математика", value: "Математика" },
-                    { label: "Русский язык", value: "Русский язык" },
-                    { label: "История", value: "История" },
-                    { label: "Химия", value: "Химия" },
+                    ...availableSubjects.map((subject) => ({ label: subject, value: subject })),
                   ]}
                   value={filters.subject ?? ""}
                   onChange={(value) => setFilters((current) => ({ ...current, subject: value || undefined }))}
@@ -134,31 +206,31 @@ function App() {
 
           </aside>
 
-          <section className="flex min-w-0 flex-col overflow-hidden rounded-[30px] bg-white shadow-[0_22px_70px_rgba(93,89,135,0.10)] ring-1 ring-slate-100">
-            <div className="flex shrink-0 flex-col gap-3 border-b border-slate-100 px-6 py-5 md:flex-row md:items-center md:justify-between">
+          <section className="flex min-w-0 flex-col overflow-hidden rounded-[26px] bg-white shadow-[0_20px_60px_rgba(93,89,135,0.09)] ring-1 ring-slate-100">
+            <div className="flex h-[72px] shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-5 py-3">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.3em] text-violet-500">
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-violet-500">
                   {mode === "chat" ? "Материалы" : "Проверка"}
                 </p>
-                <h2 className="mt-1 text-xl font-semibold text-slate-950">
+                <h2 className="mt-0.5 text-base font-semibold text-slate-950">
                   {mode === "chat" ? "Поиск нормативных ответов" : "Проверка соответствия"}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">Фильтры: {formatFilters(filters)}</p>
+                <p className="mt-0.5 truncate text-xs text-slate-500">Фильтры: {formatFilters(filters)}</p>
               </div>
 
-              <div className="flex rounded-[20px] bg-slate-100 p-1 shadow-inner">
-                <Button className="rounded-xl" variant={mode === "chat" ? "outline" : "ghost"} onClick={() => setMode("chat")}>
+              <div className="flex shrink-0 rounded-2xl bg-slate-100 p-1 shadow-inner">
+                <Button className="h-9 rounded-xl px-3" variant={mode === "chat" ? "outline" : "ghost"} onClick={() => setMode("chat")}>
                   <BookOpen className="h-4 w-4" />
                   Чат
                 </Button>
-                <Button className="rounded-xl" variant={mode === "check" ? "outline" : "ghost"} onClick={() => setMode("check")}>
+                <Button className="h-9 rounded-xl px-3" variant={mode === "check" ? "outline" : "ghost"} onClick={() => setMode("check")}>
                   <ClipboardCheck className="h-4 w-4" />
                   Проверка
                 </Button>
               </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-hidden bg-[#fbfbfe] p-5">
+            <div className="min-h-0 flex-1 overflow-hidden bg-[#fbfbfe] p-4">
               {mode === "chat" ? <ChatPanel filters={filters} /> : <CheckPanel />}
             </div>
           </section>
@@ -170,7 +242,7 @@ function App() {
 
 function PanelCard({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <Card className={cn("border-0 bg-white/90 p-4 shadow-[0_16px_42px_rgba(111,76,255,0.08)] ring-1 ring-white/80", className)}>
+    <Card className={cn("border-0 bg-white/90 p-3 shadow-[0_12px_34px_rgba(111,76,255,0.07)] ring-1 ring-white/80", className)}>
       {children}
     </Card>
   );
@@ -178,9 +250,9 @@ function PanelCard({ children, className }: { children: ReactNode; className?: s
 
 function HeaderMetric({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="min-w-14 rounded-2xl bg-white px-3 py-1.5 text-center ring-1 ring-slate-100">
-      <p className="text-base font-semibold leading-5 text-slate-950">{value}</p>
-      <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+    <div className="min-w-12 rounded-xl bg-white px-2.5 py-1 text-center ring-1 ring-slate-100">
+      <p className="text-sm font-semibold leading-4 text-slate-950">{value}</p>
+      <p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
     </div>
   );
 }
@@ -188,7 +260,7 @@ function HeaderMetric({ label, value }: { label: string; value: number | string 
 function formatFilters(filters: ChatFilters) {
   const parts = [
     filters.document_type ? documentTypeLabel(filters.document_type) : "тип не выбран",
-    filters.level ? filters.level.toUpperCase() : "уровень не выбран",
+    filters.level ? levelLabel(filters.level) : "уровень не выбран",
     filters.subject || "предмет не выбран",
   ];
   return parts.join(" • ");
@@ -200,6 +272,15 @@ function documentTypeLabel(value: string) {
     fgos: "ФГОС",
     sanpin: "СанПиН",
     profstandart: "Профстандарт",
+  };
+  return labels[value] ?? value;
+}
+
+function levelLabel(value: string) {
+  const labels: Record<string, string> = {
+    noo: "НОО",
+    ooo: "ООО",
+    soo: "СОО",
   };
   return labels[value] ?? value;
 }

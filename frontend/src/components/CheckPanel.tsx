@@ -70,7 +70,7 @@ export function CheckPanel() {
                 Результат
               </span>
             </div>
-            <Badge className="border-emerald-100 bg-emerald-50 text-emerald-700">compliance check</Badge>
+            <Badge className="border-emerald-100 bg-emerald-50 text-emerald-700">проверка соответствия</Badge>
           </div>
 
           <div className="p-6">
@@ -113,9 +113,9 @@ export function CheckPanel() {
               {upload ? <CheckCircle2 className="h-6 w-6 text-emerald-600" /> : <FileUp className="h-6 w-6" />}
             </div>
             <p className="mt-4 text-sm font-semibold text-slate-900">
-              {upload ? upload.filename : "Перетащите файл сюда или выберите PDF/DOCX"}
+              {upload ? upload.filename : "Перетащите файл сюда или выберите документ"}
             </p>
-            <p className="mt-1 text-xs text-slate-500">Максимальный размер задается backend-настройками</p>
+            <p className="mt-1 text-xs text-slate-500">Максимальный размер задается настройками сервера</p>
             <input accept=".pdf,.docx" className="hidden" onChange={handleFile} type="file" />
           </label>
 

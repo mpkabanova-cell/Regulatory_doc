@@ -56,6 +56,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
         document_type=request.document_type,
         level=request.level,
         subject=request.subject,
+        history=request.history,
     )
 
 

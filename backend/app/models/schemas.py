@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -14,12 +16,18 @@ class Source(BaseModel):
     score: float | None = None
 
 
+class ChatHistoryMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+
+
 class ChatRequest(BaseModel):
     message: str = Field(min_length=2)
     top_k: int | None = Field(default=None, ge=1, le=15)
     document_type: str | None = None
     level: str | None = None
     subject: str | None = None
+    history: list[ChatHistoryMessage] = Field(default_factory=list)
 
 
 class ChatResponse(BaseModel):

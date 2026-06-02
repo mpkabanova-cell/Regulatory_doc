@@ -31,8 +31,8 @@ export function SourceCard({ source, index, compact = false }: Props) {
           <p className="truncate text-xs leading-5 text-slate-500">{source.section || "Раздел не определен"}</p>
           <div className="flex flex-wrap items-center gap-1.5 md:justify-end">
             <Badge className="border-slate-100 bg-slate-50">стр. {source.page || "-"}</Badge>
-            <Badge className="border-violet-100 bg-violet-50 text-violet-700">{source.type}</Badge>
-            {source.level && <Badge className="border-slate-100 bg-slate-50">{source.level.toUpperCase()}</Badge>}
+            <Badge className="border-violet-100 bg-violet-50 text-violet-700">{documentTypeLabel(source.type)}</Badge>
+            {source.level && <Badge className="border-slate-100 bg-slate-50">{levelLabel(source.level)}</Badge>}
           </div>
         </div>
         <button
@@ -60,4 +60,24 @@ export function SourceCard({ source, index, compact = false }: Props) {
       )}
     </div>
   );
+}
+
+function documentTypeLabel(value: string) {
+  const labels: Record<string, string> = {
+    frp: "ФРП",
+    fgos: "ФГОС",
+    sanpin: "СанПиН",
+    profstandart: "Профстандарт",
+    unknown: "Документ",
+  };
+  return labels[value] ?? value;
+}
+
+function levelLabel(value: string) {
+  const labels: Record<string, string> = {
+    noo: "НОО",
+    ooo: "ООО",
+    soo: "СОО",
+  };
+  return labels[value] ?? value;
 }

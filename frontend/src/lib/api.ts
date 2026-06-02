@@ -1,4 +1,4 @@
-import type { ChatFilters, ChatResponse, CheckResponse, CorpusStats, UploadResponse } from "../types";
+import type { ChatFilters, ChatResponse, CheckResponse, CorpusStats, Message, UploadResponse } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "http://localhost:8000" : "");
 
@@ -35,11 +35,15 @@ export async function getHealth(): Promise<boolean> {
   }
 }
 
-export function sendChat(message: string, filters: ChatFilters = {}): Promise<ChatResponse> {
+export function sendChat(message: string, filters: ChatFilters = {}, history: Message[] = []): Promise<ChatResponse> {
   return request<ChatResponse>("/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, ...filters }),
+    body: JSON.stringify({
+      message,
+      ...filters,
+      history: history.slice(-8).map((item) => ({ role: item.role, content: item.content })),
+    }),
   });
 }
 
