@@ -4,7 +4,7 @@ from backend.app.documents.chunking import chunk_pages
 from backend.app.documents.extract import PageText
 from backend.app.documents.metadata import infer_document_metadata
 from backend.app.models.schemas import Source
-from backend.app.rag.service import infer_level, infer_subject, rank_and_dedupe_sources
+from backend.app.rag.service import build_clarification_question, infer_level, infer_subject, rank_and_dedupe_sources
 from backend.app.rag.vector_store import trim_quote
 
 
@@ -87,3 +87,20 @@ def test_ranks_matching_subject_before_nearby_other_subjects() -> None:
     ranked = rank_and_dedupe_sources([math_source, informatics_source], subject="Информатика", level="ooo")
 
     assert ranked[0].document == "ФРП Информатика"
+
+
+def test_clarifies_subject_for_subject_results_request() -> None:
+    clarification = build_clarification_question("Предметные результаты в 5 классе", subject=None, level="ooo")
+
+    assert clarification
+    assert "предмет" in clarification
+
+
+def test_does_not_clarify_when_subject_and_level_are_known() -> None:
+    clarification = build_clarification_question(
+        "Предметные результаты по информатике в 5 классе",
+        subject="Информатика",
+        level="ooo",
+    )
+
+    assert clarification is None

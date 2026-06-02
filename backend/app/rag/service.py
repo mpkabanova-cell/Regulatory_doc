@@ -27,6 +27,10 @@ class RagService:
         document_type = document_type or infer_document_type(message) or infer_document_type(retrieval_message)
         subject = infer_subject(message) or infer_subject(retrieval_message) or subject
         level = infer_level(message) or infer_level(retrieval_message) or level
+        clarification = build_clarification_question(retrieval_message, subject=subject, level=level)
+        if clarification:
+            return ChatResponse(answer=clarification, sources=[], refusal=False)
+
         relevant_sources = self.query_with_fallbacks(
             retrieval_message,
             top_k=top_k,
@@ -241,6 +245,47 @@ def infer_level(message: str) -> str | None:
                 return "ooo"
             return "soo"
     return None
+
+
+def build_clarification_question(
+    message: str,
+    subject: str | None = None,
+    level: str | None = None,
+) -> str | None:
+    if not needs_precise_subject_context(message):
+        return None
+
+    missing_parts: list[str] = []
+    if not subject:
+        missing_parts.append("предмет")
+    if not level:
+        missing_parts.append("класс или уровень образования")
+
+    if not missing_parts:
+        return None
+
+    missing = " и ".join(missing_parts)
+    return (
+        f"Уточните, пожалуйста, {missing}. "
+        "Например: «предметные результаты по информатике в 5 классе»."
+    )
+
+
+def needs_precise_subject_context(message: str) -> bool:
+    lowered = message.lower()
+    context_markers = (
+        "предметн",
+        "планируем",
+        "личностн",
+        "метапредметн",
+        "результат",
+        "содержание",
+        "тематическ",
+        "ктп",
+        "рабоч",
+        "программ",
+    )
+    return any(marker in lowered for marker in context_markers)
 
 
 def rank_and_dedupe_sources(
