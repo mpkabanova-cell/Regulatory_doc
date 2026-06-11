@@ -15,7 +15,8 @@ window.dataLayer.push({ event: goalSlug, ...payload });
 
 ## Общие правила
 
-- Префикс событий проекта: `regdoc_*`.
+- Общий префикс проекта: `regdoc`.
+- Каждый сценарий имеет собственный slug: `regdoc_shell`, `regdoc_chat`, `regdoc_check`.
 - Названия событий стабильные, в `snake_case`.
 - В payload не отправляются тексты пользовательских вопросов и имена файлов.
 - Для вопросов передаётся длина текста (`query_length`), для файлов — расширение и размер.
@@ -24,26 +25,30 @@ window.dataLayer.push({ event: goalSlug, ...payload });
 ## Сценарии продукта
 
 ```text
-Открытие приложения
+regdoc_shell: Общая оболочка и навигация
   -> Проверка состояния базы
   -> Выбор режима: Чат / Проверка
 
-Чат:
+regdoc_chat: Чат по нормативной базе
   -> Настройка фильтров
   -> Выбор подсказки или ручной ввод вопроса
   -> Отправка вопроса
   -> Получение ответа с источниками или ошибка
 
-Проверка:
+regdoc_check: Проверка документа
   -> Выбор типа материала
   -> Загрузка PDF/DOCX
   -> Запуск проверки
   -> Получение таблицы соответствия или ошибка
 ```
 
-## Глобальные события интерфейса
+## Сценарий 1. Общая оболочка и навигация
 
-### `regdoc_app_opened`
+Slug сценария: `regdoc_shell`.
+
+Цель сценария: понять, открылось ли приложение, доступна ли база и как пользователь переходит между основными разделами.
+
+### `regdoc_shell_app_opened`
 
 Срабатывает при открытии приложения.
 
@@ -53,7 +58,7 @@ window.dataLayer.push({ event: goalSlug, ...payload });
 
 Критерий: инициация использования продукта.
 
-### `regdoc_base_status_checked`
+### `regdoc_shell_base_status_checked`
 
 Срабатывает после проверки доступности backend и загрузки статистики базы.
 
@@ -68,7 +73,7 @@ window.dataLayer.push({ event: goalSlug, ...payload });
 
 Критерий: техническая готовность базы к работе.
 
-### `regdoc_select_section`
+### `regdoc_shell_select_section`
 
 Срабатывает при переключении между разделами `Чат` и `Проверка`.
 
@@ -78,7 +83,7 @@ window.dataLayer.push({ event: goalSlug, ...payload });
 
 Критерий: навигация пользователя между сценариями.
 
-### `regdoc_select_filter`
+### `regdoc_shell_select_filter`
 
 Срабатывает при изменении фильтра поиска.
 
@@ -89,7 +94,18 @@ window.dataLayer.push({ event: goalSlug, ...payload });
 
 Критерий: настройка контекста поиска перед вопросом.
 
-## Сценарий 1. Чат по нормативной базе
+### Критерии сценария `regdoc_shell`
+
+| Этап | Критерий | Событие |
+| :-- | :-- | :-- |
+| Инициация | Приложение открыто | `regdoc_shell_app_opened` |
+| Техническая готовность | Backend проверен, статистика базы получена или ошибка зафиксирована | `regdoc_shell_base_status_checked` |
+| Навигация | Пользователь выбрал раздел | `regdoc_shell_select_section` |
+| Настройка контекста | Пользователь изменил фильтр | `regdoc_shell_select_filter` |
+
+## Сценарий 2. Чат по нормативной базе
+
+Slug сценария: `regdoc_chat`.
 
 Цель сценария: пользователь получает ответ по нормативным документам с источниками.
 
@@ -145,7 +161,19 @@ window.dataLayer.push({ event: goalSlug, ...payload });
 
 Критерий: технический или продуктовый отвал в чат-сценарии.
 
-## Сценарий 2. Проверка документа
+### Критерии сценария `regdoc_chat`
+
+| Этап | Критерий | Событие |
+| :-- | :-- | :-- |
+| Инициация | Пользователь перешёл в раздел чата или выбрал подсказку | `regdoc_shell_select_section`, `regdoc_chat_prompt_selected` |
+| Старт выполнения | Пользователь отправил вопрос | `regdoc_chat_question_sent` |
+| Частичное прохождение | Backend вернул ответ | `regdoc_chat_answer_received` |
+| Полное прохождение | Ответ содержит релевантные источники | `regdoc_chat_answer_received` с `sources_count > 0` |
+| Отвал/ошибка | Ответ не получен | `regdoc_chat_error` |
+
+## Сценарий 3. Проверка документа
+
+Slug сценария: `regdoc_check`.
 
 Цель сценария: пользователь загружает учебный документ и получает таблицу соответствия нормативным требованиям.
 
@@ -218,28 +246,41 @@ window.dataLayer.push({ event: goalSlug, ...payload });
 
 Критерий: отвал на этапе анализа документа.
 
-## Критерии воронок
+### Критерии сценария `regdoc_check`
 
-| Сценарий | Инициация | Старт выполнения | Частичное прохождение | Полное прохождение |
-| :-- | :-- | :-- | :-- | :-- |
-| Чат по нормативной базе | `regdoc_app_opened` или `regdoc_select_section` со значением `chat` | `regdoc_chat_question_sent` | `regdoc_chat_answer_received` | `regdoc_chat_answer_received` с `sources_count > 0` |
-| Проверка документа | `regdoc_select_section` со значением `check` | `regdoc_check_file_uploaded` | `regdoc_check_started` | `regdoc_check_completed` |
+| Этап | Критерий | Событие |
+| :-- | :-- | :-- |
+| Инициация | Пользователь перешёл в раздел проверки | `regdoc_shell_select_section` со значением `check` |
+| Настройка контекста | Пользователь выбрал тип материала | `regdoc_check_material_type_selected` |
+| Старт выполнения | Файл успешно загружен | `regdoc_check_file_uploaded` |
+| Частичное прохождение | Пользователь запустил проверку | `regdoc_check_started` |
+| Полное прохождение | Backend вернул таблицу проверки | `regdoc_check_completed` |
+| Отвал на загрузке | Файл не загрузился | `regdoc_check_upload_error` |
+| Отвал на анализе | Проверка завершилась ошибкой | `regdoc_check_error` |
+
+## Сводные критерии воронок
+
+| Сценарий | Slug | Инициация | Старт выполнения | Частичное прохождение | Полное прохождение |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| Общая оболочка и навигация | `regdoc_shell` | `regdoc_shell_app_opened` | `regdoc_shell_base_status_checked` | `regdoc_shell_select_section` | `regdoc_shell_select_filter` |
+| Чат по нормативной базе | `regdoc_chat` | `regdoc_shell_select_section` со значением `chat` или `regdoc_chat_prompt_selected` | `regdoc_chat_question_sent` | `regdoc_chat_answer_received` | `regdoc_chat_answer_received` с `sources_count > 0` |
+| Проверка документа | `regdoc_check` | `regdoc_shell_select_section` со значением `check` | `regdoc_check_file_uploaded` | `regdoc_check_started` | `regdoc_check_completed` |
 
 ## Анализ ошибок и отвала
 
 | Этап | Событие ошибки | Основные разрезы |
 | :-- | :-- | :-- |
-| Статус базы | `regdoc_base_status_checked` с `healthy = false` | доступность backend, окружение деплоя |
+| Статус базы | `regdoc_shell_base_status_checked` с `healthy = false` | доступность backend, окружение деплоя |
 | Чат | `regdoc_chat_error` | `document_type`, `level`, `subject`, `error_message` |
 | Загрузка файла | `regdoc_check_upload_error` | `file_ext`, `file_size_kb`, `material_type`, `error_message` |
 | Проверка документа | `regdoc_check_error` | `material_type`, `error_message` |
 
 ## Итоговый список событий
 
-- `regdoc_app_opened`
-- `regdoc_base_status_checked`
-- `regdoc_select_section`
-- `regdoc_select_filter`
+- `regdoc_shell_app_opened`
+- `regdoc_shell_base_status_checked`
+- `regdoc_shell_select_section`
+- `regdoc_shell_select_filter`
 - `regdoc_chat_prompt_selected`
 - `regdoc_chat_question_sent`
 - `regdoc_chat_answer_received`

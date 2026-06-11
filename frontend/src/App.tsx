@@ -101,7 +101,7 @@ function App() {
 
   useEffect(() => {
     if (!appOpenTracked) {
-      trackEvent("regdoc_app_opened", { path: window.location.pathname });
+      trackEvent("regdoc_shell_app_opened", { path: window.location.pathname });
       appOpenTracked = true;
     }
 
@@ -112,7 +112,7 @@ function App() {
       setStats(corpusStats);
 
       if (!baseStatusTracked.current) {
-        trackEvent("regdoc_base_status_checked", {
+        trackEvent("regdoc_shell_base_status_checked", {
           healthy: healthStatus,
           documents: corpusStats?.documents,
           frp: corpusStats?.frp,
@@ -139,13 +139,13 @@ function App() {
 
   function handleModeChange(nextMode: Mode) {
     if (nextMode === mode) return;
-    trackEvent("regdoc_select_section", { section: nextMode });
+    trackEvent("regdoc_shell_select_section", { section: nextMode });
     setMode(nextMode);
   }
 
   function handleFilterChange(filterName: keyof ChatFilters, value: string) {
     const filterValue = value || undefined;
-    trackEvent("regdoc_select_filter", {
+    trackEvent("regdoc_shell_select_filter", {
       filter_name: filterName,
       filter_value: filterValue ?? "all",
     });
