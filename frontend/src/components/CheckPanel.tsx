@@ -1,5 +1,6 @@
 import { CheckCircle2, FileUp, Loader2, UploadCloud } from "lucide-react";
 import { ChangeEvent, DragEvent, useState } from "react";
+import { fileExtension, trackEvent } from "../lib/analytics";
 import { checkDocument, uploadDocument } from "../lib/api";
 import type { CheckResponse, UploadResponse } from "../types";
 import { cn } from "../lib/utils";
@@ -33,9 +34,22 @@ export function CheckPanel() {
     setError("");
     setResult(null);
     try {
-      setUpload(await uploadDocument(file));
+      const uploadedFile = await uploadDocument(file);
+      trackEvent("regdoc_check_file_uploaded", {
+        file_ext: fileExtension(file.name),
+        file_size_kb: Math.round(file.size / 1024),
+        material_type: materialType,
+      });
+      setUpload(uploadedFile);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Не удалось загрузить файл.");
+      const errorMessage = err instanceof Error ? err.message : "Не удалось загрузить файл.";
+      trackEvent("regdoc_check_upload_error", {
+        error_message: errorMessage,
+        file_ext: fileExtension(file.name),
+        file_size_kb: Math.round(file.size / 1024),
+        material_type: materialType,
+      });
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -45,10 +59,25 @@ export function CheckPanel() {
     if (!upload) return;
     setLoading(true);
     setError("");
+    trackEvent("regdoc_check_started", {
+      material_type: materialType,
+      file_ext: fileExtension(upload.filename),
+    });
     try {
-      setResult(await checkDocument(upload.upload_id, materialType));
+      const checkResult = await checkDocument(upload.upload_id, materialType);
+      trackEvent("regdoc_check_completed", {
+        material_type: materialType,
+        requirements_count: checkResult.rows.length,
+        sources_count: checkResult.sources.length,
+      });
+      setResult(checkResult);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Не удалось выполнить проверку.");
+      const errorMessage = err instanceof Error ? err.message : "Не удалось выполнить проверку.";
+      trackEvent("regdoc_check_error", {
+        error_message: errorMessage,
+        material_type: materialType,
+      });
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -86,7 +115,12 @@ export function CheckPanel() {
             </div>
             <select
               className="h-11 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-800 shadow-sm outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
-              onChange={(event) => setMaterialType(event.target.value)}
+              onChange={(event) => {
+                trackEvent("regdoc_check_material_type_selected", {
+                  material_type: event.target.value,
+                });
+                setMaterialType(event.target.value);
+              }}
               value={materialType}
             >
               {MATERIAL_TYPES.map((type) => (

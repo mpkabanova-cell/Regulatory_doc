@@ -5,11 +5,12 @@ import {
   Database,
   GraduationCap,
 } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { ChatPanel } from "./components/ChatPanel";
 import { CheckPanel } from "./components/CheckPanel";
 import { Button } from "./components/ui/button";
 import { Card } from "./components/ui/card";
+import { trackEvent } from "./lib/analytics";
 import { getHealth, getStats } from "./lib/api";
 import { cn } from "./lib/utils";
 import type { ChatFilters, CorpusStats } from "./types";
@@ -89,15 +90,43 @@ const ALL_SUBJECTS = Array.from(new Set(Object.values(SUBJECTS_BY_LEVEL).flat())
   first.localeCompare(second, "ru"),
 );
 
+let appOpenTracked = false;
+
 function App() {
   const [mode, setMode] = useState<Mode>("chat");
   const [stats, setStats] = useState<CorpusStats | null>(null);
   const [healthy, setHealthy] = useState<boolean | null>(null);
   const [filters, setFilters] = useState<ChatFilters>({});
+  const baseStatusTracked = useRef(false);
 
   useEffect(() => {
-    void getHealth().then(setHealthy);
-    void getStats().then(setStats).catch(() => setStats(null));
+    if (!appOpenTracked) {
+      trackEvent("regdoc_app_opened", { path: window.location.pathname });
+      appOpenTracked = true;
+    }
+
+    let cancelled = false;
+    void Promise.all([getHealth(), getStats().catch(() => null)]).then(([healthStatus, corpusStats]) => {
+      if (cancelled) return;
+      setHealthy(healthStatus);
+      setStats(corpusStats);
+
+      if (!baseStatusTracked.current) {
+        trackEvent("regdoc_base_status_checked", {
+          healthy: healthStatus,
+          documents: corpusStats?.documents,
+          frp: corpusStats?.frp,
+          fgos: corpusStats?.fgos,
+          sanpin: corpusStats?.sanpin,
+          profstandart: corpusStats?.profstandart,
+        });
+        baseStatusTracked.current = true;
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const availableSubjects = filters.level ? SUBJECTS_BY_LEVEL[filters.level] ?? ALL_SUBJECTS : ALL_SUBJECTS;
@@ -107,6 +136,21 @@ function App() {
       setFilters((current) => ({ ...current, subject: undefined }));
     }
   }, [availableSubjects, filters.subject]);
+
+  function handleModeChange(nextMode: Mode) {
+    if (nextMode === mode) return;
+    trackEvent("regdoc_select_section", { section: nextMode });
+    setMode(nextMode);
+  }
+
+  function handleFilterChange(filterName: keyof ChatFilters, value: string) {
+    const filterValue = value || undefined;
+    trackEvent("regdoc_select_filter", {
+      filter_name: filterName,
+      filter_value: filterValue ?? "all",
+    });
+    setFilters((current) => ({ ...current, [filterName]: filterValue }));
+  }
 
   return (
     <main className="h-screen overflow-hidden bg-[#fbf8ff] p-3 text-slate-950 md:p-4">
@@ -179,7 +223,7 @@ function App() {
                     { label: "Профстандарт", value: "profstandart" },
                   ]}
                   value={filters.document_type ?? ""}
-                  onChange={(value) => setFilters((current) => ({ ...current, document_type: value || undefined }))}
+                  onChange={(value) => handleFilterChange("document_type", value)}
                 />
                 <FilterSelect
                   label="Уровень образования"
@@ -190,7 +234,7 @@ function App() {
                     { label: "СОО", value: "soo" },
                   ]}
                   value={filters.level ?? ""}
-                  onChange={(value) => setFilters((current) => ({ ...current, level: value || undefined }))}
+                  onChange={(value) => handleFilterChange("level", value)}
                 />
                 <FilterSelect
                   label="Предмет"
@@ -199,7 +243,7 @@ function App() {
                     ...availableSubjects.map((subject) => ({ label: subject, value: subject })),
                   ]}
                   value={filters.subject ?? ""}
-                  onChange={(value) => setFilters((current) => ({ ...current, subject: value || undefined }))}
+                  onChange={(value) => handleFilterChange("subject", value)}
                 />
               </div>
             </PanelCard>
@@ -219,11 +263,11 @@ function App() {
               </div>
 
               <div className="flex shrink-0 rounded-2xl bg-slate-100 p-1 shadow-inner">
-                <Button className="h-9 rounded-xl px-3" variant={mode === "chat" ? "outline" : "ghost"} onClick={() => setMode("chat")}>
+                <Button className="h-9 rounded-xl px-3" variant={mode === "chat" ? "outline" : "ghost"} onClick={() => handleModeChange("chat")}>
                   <BookOpen className="h-4 w-4" />
                   Чат
                 </Button>
-                <Button className="h-9 rounded-xl px-3" variant={mode === "check" ? "outline" : "ghost"} onClick={() => setMode("check")}>
+                <Button className="h-9 rounded-xl px-3" variant={mode === "check" ? "outline" : "ghost"} onClick={() => handleModeChange("check")}>
                   <ClipboardCheck className="h-4 w-4" />
                   Проверка
                 </Button>

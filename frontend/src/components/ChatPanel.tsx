@@ -2,6 +2,7 @@ import { SendHorizontal, Sparkles } from "lucide-react";
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { toPromptSlug, trackEvent } from "../lib/analytics";
 import { sendChat } from "../lib/api";
 import type { ChatFilters, Message } from "../types";
 import { Button } from "./ui/button";
@@ -86,8 +87,22 @@ export function ChatPanel({ filters }: ChatPanelProps) {
     setLoading(true);
     setError("");
     setMessages((current) => [...current, { role: "user", content: message }]);
+    trackEvent("regdoc_chat_question_sent", {
+      query_length: message.length,
+      document_type: filtersRef.current.document_type,
+      level: filtersRef.current.level,
+      subject: filtersRef.current.subject,
+      history_length: messagesRef.current.length,
+    });
     try {
       const response = await sendChat(message, filtersRef.current, messagesRef.current);
+      trackEvent("regdoc_chat_answer_received", {
+        answer_length: response.answer.length,
+        sources_count: response.sources.length,
+        document_type: filtersRef.current.document_type,
+        level: filtersRef.current.level,
+        subject: filtersRef.current.subject,
+      });
       setMessages((current) => [
         ...current,
         { role: "assistant", content: response.answer, sources: response.sources },
@@ -97,6 +112,12 @@ export function ChatPanel({ filters }: ChatPanelProps) {
         error instanceof Error
           ? error.message
           : "Не удалось получить ответ. Проверьте, что сервер запущен на http://localhost:8000.";
+      trackEvent("regdoc_chat_error", {
+        error_message: errorMessage,
+        document_type: filtersRef.current.document_type,
+        level: filtersRef.current.level,
+        subject: filtersRef.current.subject,
+      });
       setError(errorMessage);
       setMessages((current) => [
         ...current,
@@ -188,7 +209,13 @@ export function ChatPanel({ filters }: ChatPanelProps) {
                 <button
                   className="shrink-0 rounded-full border border-violet-100 bg-[#fbf8ff] px-3 py-2 text-left text-xs font-medium text-slate-600 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
                   key={prompt}
-                  onClick={() => handleInput(prompt)}
+                  onClick={() => {
+                    trackEvent("regdoc_chat_prompt_selected", {
+                      prompt_slug: toPromptSlug(prompt),
+                      prompt_length: prompt.length,
+                    });
+                    handleInput(prompt);
+                  }}
                   type="button"
                 >
                   {prompt}
